@@ -2,7 +2,7 @@
     "title": "Bilibili DM Adapter",
     "description": "Koishi Bilibili 私信适配器插件文档",
     "ignoreDeadLinks": true,
-    "base": "/adapter-bilibili-dm/",
+    "base": "/koishi-plugin-adapter-bilibili-dm/",
     "head": [
         [
             "link",
@@ -42,4 +42,5 @@
             }
         ]
     }
+
 }
