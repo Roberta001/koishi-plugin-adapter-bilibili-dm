@@ -27,7 +27,7 @@
             "text": "上次更新"
         },
         "editLink": {
-            "pattern": "https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm/edit/main/adapter-bilibili-dm-docs/docs/:path",
+            "pattern": "https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm/edit/docs/docs/:path",
             "text": "在 GitHub 上编辑此页"
         },
         "logo": "https://www.bilibili.com/favicon.ico",
@@ -42,5 +42,4 @@
             }
         ]
     }
-
 }
