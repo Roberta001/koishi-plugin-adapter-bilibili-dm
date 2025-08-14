@@ -1,66 +1,23 @@
 {
-  "name": "koishi-plugin-adapter-bilibili-dm",
-  "version": "2.2.3",
-  "description": "Bilibili Direct Message Adapter for Koishi\nBilibili 私信适配器",
-  "typings": "lib/index.d.ts",
-  "main": "lib/index.js",
-  "files": [
-    "client",
-    "dist",
-    "src",
-    "lib"
-  ],
+  "name": "koishi-plugin-adapter-bilibili-dm-docs",
+  "version": "1.0.0",
+  "description": "Documentation for koishi-plugin-adapter-bilibili-dm",
+  "main": "index.js",
   "license": "MIT",
-  "author": "leafingxyz <2596628651@qq.com>",
-  "contributors": [
-    "shangxueink <1919892171@qq.com>",
-    "leafingxyz <2596628651@qq.com>"
-  ],
-  "bugs": {
-    "url": "https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm/issues"
-  },
-  "homepage": "https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm",
-  "scripts": {
-    "build": "tsc -b",
-    "pub": "npm publish --registry=https://registry.npmjs.org/ --access=public"
-  },
-  "keywords": [
-    "bilibili",
-    "chatbot",
-    "adapter",
-    "koishi",
-    "satori",
-    "私信",
-    "bot"
-  ],
-  "koishi": {
-    "description": {
-      "es": "Adaptador de mensajes directos de Bilibili para Koishi",
-      "fr": "Adaptateur de messages directs Bilibili pour Koishi",
-      "de": "Bilibili Direktnachrichten-Adapter für Koishi",
-      "ru": "Адаптер прямых сообщений Bilibili для Koishi",
-      "ja": "Koishi用Bilibiliダイレクトメッセージアダプター",
-      "en": "Bilibili Direct Message Adapter for Koishi",
-      "zh": "Bilibili 私信适配器"
-    },
-    "preview": true,
-    "hidden": false,
-    "service": {}
-  },
-  "peerDependencies": {
-    "koishi": "^4.16.0"
-  },
+  "type": "module",
   "dependencies": {
-    "@koishijs/client": "^5.29.4",
-    "@koishijs/plugin-console": "^5.30.9",
-    "axios": "^1.6.7",
-    "qrcode": "^1.5.4",
-    "uuid": "^9.0.1"
+    "@cordisjs/vitepress": "^4.0.1",
+    "@vueuse/core": "^13.0.0",
+    "typescript": "^5.8.2",
+    "vitepress": "^1.6.3",
+    "vue": "3",
+    "vue-tsc": "^2.2.8"
   },
-  "devDependencies": {
-    "@types/node": "^20.11.24",
-    "@types/qrcode": "^1.5.5",
-    "@types/uuid": "^9.0.8",
-    "typescript": "^5.3.3"
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs",
+    "start": "vitepress preview docs",
+    "typecheck": "vue-tsc --noEmit"
   }
 }
