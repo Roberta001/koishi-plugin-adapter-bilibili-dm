@@ -1,0 +1,56 @@
+[
+    {
+        "text": "开始使用",
+        "items": [
+            {
+                "text": "项目介绍",
+                "link": "/"
+            },
+            {
+                "text": "快速开始",
+                "link": "/markdown/quick-start"
+            },
+            {
+                "text": "配置指南",
+                "link": "/markdown/configuration"
+            }
+        ]
+    },
+    {
+        "text": "开发文档",
+        "items": [
+            {
+                "text": "API 文档",
+                "link": "/markdown/api"
+            },
+            {
+                "text": "常见问题",
+                "link": "/markdown/FAQ"
+            },
+            {
+                "text": "开发指南",
+                "link": "/markdown/development"
+            }
+        ]
+    },
+    {
+        "text": "链接",
+        "items": [
+            {
+                "text": "GitHub 仓库",
+                "link": "https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm",
+                "target": "_blank"
+            },
+            {
+                "text": "NPM 包",
+                "link": "https://www.npmjs.com/package/koishi-plugin-adapter-bilibili-dm",
+                "target": "_blank"
+            },
+            {
+                "text": "Koishi 官网",
+                "link": "https://koishi.chat",
+                "target": "_blank"
+            }
+        ]
+    }
+]

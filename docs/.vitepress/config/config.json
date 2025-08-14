@@ -1,0 +1,45 @@
+{
+    "title": "Bilibili DM Adapter",
+    "description": "Koishi Bilibili 私信适配器插件文档",
+    "ignoreDeadLinks": true,
+    "base": "/adapter-bilibili-dm/",
+    "head": [
+        [
+            "link",
+            {
+                "rel": "icon",
+                "href": "https://www.bilibili.com/favicon.ico"
+            }
+        ],
+        [
+            "meta",
+            {
+                "name": "theme-color",
+                "content": "#00A1D6"
+            }
+        ]
+    ],
+    "themeConfig": {
+        "socialLinks": {
+            "github": "https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm"
+        },
+        "lastUpdated": {
+            "text": "上次更新"
+        },
+        "editLink": {
+            "pattern": "https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm/edit/main/adapter-bilibili-dm-docs/docs/:path",
+            "text": "在 GitHub 上编辑此页"
+        },
+        "logo": "https://www.bilibili.com/favicon.ico",
+        "nav": [
+            {
+                "text": "指南",
+                "link": "/markdown/quick-start"
+            },
+            {
+                "text": "API",
+                "link": "/markdown/api"
+            }
+        ]
+    }
+}
