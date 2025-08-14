@@ -1,3 +1,18 @@
+# API 文档
+
+以下所有bot均通过这样获取
+```typescript
+const bot = Object.values(ctx.bots).find(b => b.selfId === "123456789" || b.user?.id === "123456789");
+if (!bot || bot.status !== Universal.Status.ONLINE) {
+  ctx.logger.error(`[定时发送] 机器人离线或未找到: ${config.botId}`);
+  return;
+} else {
+  ctx.logger.info(`定时成功：将由 ${config.botId} 执行`);
+}
+if (bot == null) return;
+```
+
+
 ## Bot 通用方法
 
 ### sendMessage
@@ -16,8 +31,8 @@ sendMessage(channelId: string, content: Fragment): Promise<string[]>
 
 **示例:**
 ```javascript
-await session.bot.sendMessage('private:123456789', 'Hello!')
-await session.bot.sendMessage('private:123456789', h.image('https://example.com/image.jpg'))
+await bot.sendMessage('private:123456789', 'Hello!')
+await bot.sendMessage('private:123456789', h.image('https://example.com/image.jpg'))
 ```
 
 ### sendPrivateMessage
@@ -36,7 +51,7 @@ sendPrivateMessage(userId: string, content: Fragment): Promise<string[]>
 
 **示例:**
 ```javascript
-await session.bot.sendPrivateMessage('123456789', 'Hello private!')
+await bot.sendPrivateMessage('123456789', 'Hello private!')
 ```
 
 ### getMessage
@@ -55,7 +70,7 @@ getMessage(channelId: string, messageId: string): Promise<any | undefined>
 
 **示例:**
 ```javascript
-const message = await session.bot.getMessage('private:123456789', 'msg_key_123')
+const message = await bot.getMessage('private:123456789', 'msg_key_123')
 ```
 
 ### deleteMessage
@@ -74,7 +89,7 @@ deleteMessage(channelId: string, messageId: string): Promise<void>
 
 **示例:**
 ```javascript
-await session.bot.deleteMessage('private:123456789', 'msg_key_123')
+await bot.deleteMessage('private:123456789', 'msg_key_123')
 ```
 
 # Bot Internal 方法
@@ -96,7 +111,7 @@ followUser(uid: string): Promise<boolean>
 
 **示例:**
 ```javascript
-const success = await session.bot.internal.followUser('123456789')
+const success = await bot.internal.followUser('123456789')
 ```
 
 ### unfollowUser
@@ -114,7 +129,7 @@ unfollowUser(uid: string): Promise<boolean>
 
 **示例:**
 ```javascript
-const success = await session.bot.internal.unfollowUser('123456789')
+const success = await bot.internal.unfollowUser('123456789')
 ```
 
 ### getFollowedUsers
@@ -132,7 +147,7 @@ getFollowedUsers(maxPages?: number): Promise<FollowingUser[]>
 
 **示例:**
 ```javascript
-const followedUsers = await session.bot.internal.getFollowedUsers(5)
+const followedUsers = await bot.internal.getFollowedUsers(5)
 ```
 
 ### getUserInfo
@@ -150,7 +165,7 @@ getUserInfo(uid: string): Promise<any>
 
 **示例:**
 ```javascript
-const userInfo = await session.bot.internal.getUserInfo('123456789')
+const userInfo = await bot.internal.getUserInfo('123456789')
 ```
 
 ### isFollowing
@@ -168,7 +183,7 @@ isFollowing(uid: string): Promise<boolean>
 
 **示例:**
 ```javascript
-const isFollowing = await session.bot.internal.isFollowing('123456789')
+const isFollowing = await bot.internal.isFollowing('123456789')
 ```
 
 ### batchCheckFollowing
@@ -186,7 +201,7 @@ batchCheckFollowing(uids: string[]): Promise<Record<string, boolean>>
 
 **示例:**
 ```javascript
-const followStatus = await session.bot.internal.batchCheckFollowing(['123', '456', '789'])
+const followStatus = await bot.internal.batchCheckFollowing(['123', '456', '789'])
 ```
 
 ## 动态相关
@@ -207,7 +222,7 @@ getPersonalDynamics(uid: string, offset?: string): Promise<DynamicItem[]>
 
 **示例:**
 ```javascript
-const dynamics = await session.bot.internal.getPersonalDynamics('123456789')
+const dynamics = await bot.internal.getPersonalDynamics('123456789')
 ```
 
 ### getDynamicDetail
@@ -225,7 +240,7 @@ getDynamicDetail(dynamicId: string): Promise<DynamicItem | null>
 
 **示例:**
 ```javascript
-const detail = await session.bot.internal.getDynamicDetail('dynamic_id_123')
+const detail = await bot.internal.getDynamicDetail('dynamic_id_123')
 ```
 
 ### getAllFollowedDynamics
@@ -244,7 +259,7 @@ getAllFollowedDynamics(offset?: string, updateBaseline?: string): Promise<Dynami
 
 **示例:**
 ```javascript
-const allDynamics = await session.bot.internal.getAllFollowedDynamics()
+const allDynamics = await bot.internal.getAllFollowedDynamics()
 ```
 
 ## 搜索相关
@@ -264,7 +279,7 @@ comprehensiveSearch(keyword: string): Promise<ComprehensiveSearchResponse | null
 
 **示例:**
 ```javascript
-const results = await session.bot.internal.comprehensiveSearch('关键词')
+const results = await bot.internal.comprehensiveSearch('关键词')
 ```
 
 ### searchUsers
@@ -283,7 +298,7 @@ searchUsers(keyword: string, options?: SearchOptions): Promise<SearchUser[]>
 
 **示例:**
 ```javascript
-const users = await session.bot.internal.searchUsers('用户名')
+const users = await bot.internal.searchUsers('用户名')
 ```
 
 ### searchVideos
@@ -302,7 +317,7 @@ searchVideos(keyword: string, options?: SearchOptions): Promise<SearchVideo[]>
 
 **示例:**
 ```javascript
-const videos = await session.bot.internal.searchVideos('视频标题')
+const videos = await bot.internal.searchVideos('视频标题')
 ```
 
 ## 直播相关
@@ -319,7 +334,7 @@ getLiveUsers(): Promise<any[]>
 
 **示例:**
 ```javascript
-const liveUsers = await session.bot.internal.getLiveUsers()
+const liveUsers = await bot.internal.getLiveUsers()
 ```
 
 ### getUserLiveStatus
@@ -337,7 +352,7 @@ getUserLiveStatus(mid: number): Promise<any>
 
 **示例:**
 ```javascript
-const liveStatus = await session.bot.internal.getUserLiveStatus(123456789)
+const liveStatus = await bot.internal.getUserLiveStatus(123456789)
 ```
 
 ### isUserLive
@@ -355,7 +370,7 @@ isUserLive(mid: number): Promise<boolean>
 
 **示例:**
 ```javascript
-const isLive = await session.bot.internal.isUserLive(123456789)
+const isLive = await bot.internal.isUserLive(123456789)
 ```
 
 # 事件监听
