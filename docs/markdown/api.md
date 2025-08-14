@@ -4,10 +4,8 @@
 ```typescript
 const bot = Object.values(ctx.bots).find(b => b.selfId === "123456789" || b.user?.id === "123456789");
 if (!bot || bot.status !== Universal.Status.ONLINE) {
-  ctx.logger.error(`[定时发送] 机器人离线或未找到: ${config.botId}`);
+  ctx.logger.error(`机器人离线或未找到: ${config.botId}`);
   return;
-} else {
-  ctx.logger.info(`定时成功：将由 ${config.botId} 执行`);
 }
 if (bot == null) return;
 ```
