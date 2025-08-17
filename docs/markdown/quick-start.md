@@ -9,6 +9,8 @@
 3. 搜索 `adapter-bilibili-dm`
 4. 点击安装
 
+<img src="https://i0.hdslb.com/bfs/openplatform/ccf09979c5dc0174a462f38dc900cd87c91f925b.png" alt="market" referrerpolicy="no-referrer" width="500">
+
 ### 通过命令行安装
 
 ```bash
@@ -25,11 +27,11 @@ npm install koishi-plugin-adapter-bilibili-dm
 
 #### 手机端获取方法
 
-[->点击此处查看 手机端获取方法](https://i0.hdslb.com/bfs/openplatform/9168ed872d8d132ee32d265b17327bbda5d40588.png)
+<img src="https://i0.hdslb.com/bfs/openplatform/9168ed872d8d132ee32d265b17327bbda5d40588.png" alt="手机端获取方法" referrerpolicy="no-referrer" width="500">
 
-#### 电脑端获取方法
+#### WEB端获取方法
 
-[->点击此处查看 电脑端获取方法](https://i0.hdslb.com/bfs/openplatform/b216ed9fd08585fd2b1b7e89cef06618e10553c2.png)
+<img src="https://i0.hdslb.com/bfs/openplatform/44f38e9a76c90cc6ceba563931ea5fe67a034dca.png" alt="WEB端获取方法" referrerpolicy="no-referrer" width="500">
 
 ### 2. 配置插件
 
@@ -45,7 +47,7 @@ npm install koishi-plugin-adapter-bilibili-dm
 2. 使用 Bilibili APP 扫描二维码
 3. 确认登录
 
-[->点击此处查看 登录认证](https://i0.hdslb.com/bfs/openplatform/d3f604c1b732ff83f0874ee89027dda8e4c3031a.png)
+<img src="https://i0.hdslb.com/bfs/openplatform/d3f604c1b732ff83f0874ee89027dda8e4c3031a.png" alt="登录认证" referrerpolicy="no-referrer" width="500">
 
 
 ## 验证安装
@@ -53,5 +55,5 @@ npm install koishi-plugin-adapter-bilibili-dm
 配置完成后，你可以：
 
 1. 在 Koishi 控制台查看适配器状态
-2. 尝试发送一条测试私信（例如help、inspect）
+2. 尝试发送一条测试私信（例如`help`、`inspect`）
 3. 检查是否能正常接收、回应私信

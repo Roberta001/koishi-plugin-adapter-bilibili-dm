@@ -2,9 +2,12 @@
 
 > Koishi Bilibili 私信适配器插件
 
-[![npm](https://img.shields.io/npm/v/koishi-plugin-adapter-bilibili-dm?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-adapter-bilibili-dm)
+[![npm](https://img.shields.io/npm/v/koishi-plugin-adapter-bilibili-dm?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-adapter-bilibili-dm)    
 
-让你的 Koishi 机器人支持 Bilibili 私信功能。
+[![npm downloads](https://img.shields.io/npm/dm/koishi-plugin-adapter-bilibili-dm)](https://www.npmjs.com/package/koishi-plugin-adapter-bilibili-dm)
+
+
+让你的 Koishi 机器人接入 Bilibili 私信。
 
 ![preview.gif](https://raw.githubusercontent.com/Roberta001/koishi-plugin-adapter-bilibili-dm/refs/heads/docs/screenshot/preview.gif)
 

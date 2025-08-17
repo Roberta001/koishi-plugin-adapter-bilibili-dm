@@ -5,6 +5,10 @@
 ## 本地开发
 
 ```bash
+git clone https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm/tree/docs
+
+cd koishi-plugin-adapter-bilibili-dm
+
 # 安装依赖
 yarn install
 
