@@ -1,6 +1,6 @@
 {
   "name": "koishi-plugin-adapter-bilibili-dm",
-  "version": "2.2.8",
+  "version": "2.2.9",
   "description": "Bilibili Direct Message Adapter for Koishi\nBilibili 私信适配器",
   "typings": "lib/index.d.ts",
   "main": "lib/index.js",

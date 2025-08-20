@@ -599,10 +599,60 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
 
     logInfo(content)
 
+    const processedContent = this.preprocessContent(content)
+
     const encoder = new BilibiliMessageEncoder(this, channelId, undefined, {})
-    const messages = await encoder.send(content)
+    const messages = await encoder.send(processedContent)
 
     return messages.map(message => message.id).filter(id => id !== undefined) as string[]
+  }
+
+  private preprocessContent(content: Fragment): Fragment {
+    if (typeof content === 'string') {
+      return content
+    }
+    
+    if (Array.isArray(content)) {
+      return content.map(item => this.preprocessContent(item)).filter(item => item !== null) as Fragment
+    }
+    
+    if (content && typeof content === 'object' && 'type' in content) {
+      const element = content as h
+      
+      // 如果是 i18n 元素，尝试手动渲染它
+      if (element.type === 'i18n') {
+        try {
+          const path = element.attrs?.path
+          if (path && this.ctx.i18n) {
+            const locales = this.ctx.i18n.fallback([])
+            try {
+              const text = this.ctx.i18n.text(locales, [path], element.attrs || {})
+              if (text && typeof text === 'string') {
+                return h('text', { content: text })
+              }
+            } catch (e) {
+            }
+          }
+          return h('text', { content: `[${element.attrs?.path || 'i18n'}]` })
+        } catch (error) {
+          // 渲染失败时返回占位符
+          return h('text', { content: `[${element.attrs?.path || 'i18n'}]` })
+        }
+      }
+      
+      // 递归处理子元素
+      if (element.children && element.children.length > 0) {
+        const processedChildren = element.children
+          .map(child => this.preprocessContent(child))
+          .filter(child => child !== null) as Fragment[]
+        
+        return h(element.type, element.attrs, ...processedChildren)
+      }
+      
+      return element
+    }
+    
+    return content
   }
 
   async sendPrivateMessage(userId: string, content: Fragment): Promise<string[]> {

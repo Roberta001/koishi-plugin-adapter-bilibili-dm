@@ -49,13 +49,6 @@ export class BilibiliMessageEncoder extends MessageEncoder<Context, BilibiliDmBo
                 this.textBuffer += '\n'
                 break
 
-            case 'i18n':
-                const locales = this.bot.ctx.i18n?.fallback([]) || []
-                const rendered = this.bot.ctx.i18n?.render(locales, [attrs?.path], attrs) || []
-                for (const renderedElement of rendered) {
-                    await this.visit(renderedElement)
-                }
-                break
 
             case 'image':
             case 'img':
