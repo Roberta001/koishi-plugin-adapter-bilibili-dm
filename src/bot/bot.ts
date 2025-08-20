@@ -409,7 +409,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
   }
 
   private async adaptMessage(msg: PrivateMessage, sessionType: number, talkerId: number) {
-    if (msg.sender_uid === this.selfId) return
+    if (String(msg.sender_uid) === this.selfId) return
 
     // 屏蔽的UID
     const senderUid = msg.sender_uid;
@@ -462,8 +462,8 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
 
     if (!contentFragment) return
 
-    // 获取用户信息
-    const user = await this.getUser(msg.sender_uid)
+    // 获取用户信息 - 确保 userId 为字符串类型
+    const user = await this.getUser(String(msg.sender_uid))
 
     const session = this.session({
       type: 'message',
@@ -482,7 +482,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
           id: msg.msg_key,
           content: '该消息已被发送者撤回',
           timestamp: msg.timestamp * 1000, // 毫秒
-          user: { id: msg.sender_uid }
+          user: { id: String(msg.sender_uid) }
         } : undefined,
       },
     })
@@ -495,7 +495,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
           id: sessionType === 1 ? `private:${talkerId}` : `${talkerId}`,
           type: sessionType === 1 ? Universal.Channel.Type.DIRECT : Universal.Channel.Type.TEXT
         },
-        user: { id: msg.sender_uid },
+        user: { id: String(msg.sender_uid) },
         message: { id: msg.msg_key }
       }))
     } else {
@@ -662,7 +662,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
       contentFragment = '[消息解析失败]'
     }
 
-    const user = await this.getUser(targetMsg.sender_uid)
+    const user = await this.getUser(String(targetMsg.sender_uid))
 
     const message: Universal.Message = {
       id: targetMsg.msg_key,
