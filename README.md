@@ -6,15 +6,20 @@
 
 ```bash
 git clone https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm.git
-
+```
+```
 cd koishi-plugin-adapter-bilibili-dm
-
+```
+```
 git checkout docs
-
+```
+```
 yarn install
-
+```
+```
 yarn dev
-
+```
+```
 yarn build
 ```
 
@@ -24,3 +29,4 @@ yarn build
 - `/docs/.vitepress` - VitePress 配置
 
 - `/docs/markdown` - 各个文档页面
+
