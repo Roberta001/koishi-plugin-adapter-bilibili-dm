@@ -898,3 +898,161 @@ export interface InternalInterface {
     getUserLiveStatus(mid: number): Promise<LiveUser | null>
     isUserLive(mid: number): Promise<boolean>
 }
+
+// 直播间相关类型定义
+export interface LiveRoomInfo {
+    uid: number
+    room_id: number
+    short_id: number
+    attention: number
+    online: number
+    is_portrait: boolean
+    description: string
+    live_status: number
+    area_id: number
+    parent_area_id: number
+    parent_area_name: string
+    old_area_id: number
+    background: string
+    title: string
+    user_cover: string
+    keyframe: string
+    is_strict_room: boolean
+    live_time: string
+    tags: string
+    is_anchor: number
+    room_silent_type: string
+    room_silent_level: number
+    room_silent_second: number
+    area_name: string
+    pendants: string
+    area_pendants: string
+    hot_words: string[]
+    hot_words_status: number
+    verify: string
+    new_pendants: {
+        frame: any
+        badge: any
+        mobile_frame: any
+        mobile_badge: any
+    }
+    up_session: string
+    pk_status: number
+    pk_id: number
+    battle_id: number
+    allow_change_area_time: number
+    allow_upload_cover_time: number
+    studio_info: {
+        status: number
+        master_list: any[]
+    }
+}
+
+// 直播弹幕服务器配置
+export interface DanmakuServerInfo {
+    group: string
+    business_id: number
+    refresh_row_factor: number
+    refresh_rate: number
+    max_delay: number
+    token: string
+    host_list: Array<{
+        host: string
+        port: number
+        wss_port: number
+        ws_port: number
+    }>
+}
+
+// WebSocket数据包头部
+export interface WSPacketHeader {
+    packetLength: number    // 封包总大小
+    headerLength: number    // 头部大小 (一般为16)
+    protocolVersion: number // 协议版本 0:普通包 1:心跳认证包 2:zlib压缩 3:brotli压缩
+    operation: number       // 操作码
+    sequenceId: number      // 序列号
+}
+
+// WebSocket操作码枚举
+export enum WSOperation {
+    HANDSHAKE = 7,          // 握手包
+    HANDSHAKE_REPLY = 8,    // 握手回复
+    HEARTBEAT = 2,          // 心跳包
+    HEARTBEAT_REPLY = 3,    // 心跳回复
+    SEND_MSG = 5,           // 发送消息
+    SEND_MSG_REPLY = 6,     // 发送消息回复
+    DISCONNECT_REPLY = 9,   // 断开连接回复
+}
+
+// 直播弹幕消息类型
+export interface LiveDanmakuMessage {
+    cmd: string
+    data?: any
+    info?: any[]
+}
+
+// DANMU_MSG 弹幕消息
+export interface DanmuMsgData {
+    text: string           // 弹幕内容
+    uid: number           // 用户UID
+    uname: string         // 用户名
+    timestamp: number     // 时间戳
+    color: number         // 弹幕颜色
+    fontSize: number      // 字体大小
+    mode: number          // 弹幕模式
+    medal?: {             // 粉丝牌
+        name: string        // 牌子名
+        level: number       // 等级
+        color: number       // 颜色
+        anchor_uname: string // 主播名
+        anchor_roomid: number // 主播房间号
+    }
+    user_level: number    // 用户等级
+    is_vip: boolean       // 是否VIP
+    is_svip: boolean      // 是否SVIP
+    is_admin: boolean     // 是否房管
+    title?: string        // 头衔
+}
+
+// SEND_GIFT 礼物消息
+export interface SendGiftData {
+    giftName: string      // 礼物名称
+    num: number           // 数量
+    uname: string         // 用户名
+    face: string          // 头像
+    guard_level: number   // 舰长等级
+    uid: number           // 用户UID
+    timestamp: number     // 时间戳
+    giftId: number        // 礼物ID
+    price: number         // 价格
+    rnd: string           // 随机数
+    coin_type: string     // 硬币类型
+    total_coin: number    // 总价值
+}
+
+// WELCOME 进入直播间消息
+export interface WelcomeData {
+    uid: number           // 用户UID
+    uname: string         // 用户名
+    is_admin: boolean     // 是否房管
+    vip: number           // VIP等级
+    svip: number          // SVIP等级
+}
+
+// 直播间事件数据
+export interface LiveChatEventData {
+    roomId: number        // 直播间ID
+    roomInfo: {
+        title: string       // 直播间标题
+        uname: string       // 主播名
+        face: string        // 主播头像
+        area_name: string   // 分区名
+        online: number      // 在线人数
+    }
+    message: {
+        type: 'danmaku' | 'gift' | 'welcome' | 'guard_buy' | 'super_chat' | 'interact' | 'entry_effect' | 'watched_change' | 'other'
+        data: DanmuMsgData | SendGiftData | WelcomeData | any
+        timestamp: number
+        raw: any            // 原始数据
+    }
+}

@@ -178,6 +178,16 @@ export class HttpClient {
     const wbiSign = createHash('md5').update(query + mixinKey).digest('hex')
     return { w_rid: wbiSign, wts: currTime }
   }
+
+  // 公共方法用于获取WBI签名
+  async getWbiSignature(params: Record<string, any>): Promise<{ w_rid: string, wts: number }> {
+    return this.signWithWbi(params)
+  }
+
+  // 获取CSRF token
+  getBiliJct(): string {
+    return this.biliJct
+  }
   // #endregion
 
   // #region Login & Auth

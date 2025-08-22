@@ -5,6 +5,8 @@ import { DynamicAPI } from './apis/dynamic'
 import { UserAPI } from './apis/user'
 import { SearchAPI } from './apis/search'
 import { LiveAPI } from './apis/live'
+import { LiveRoomAPI } from './apis/liveRoom'
+import { LiveWebSocketManager } from './apis/liveWebSocket'
 import {
     DynamicItem,
     FollowingUser,
@@ -17,6 +19,7 @@ import {
     ComprehensiveSearchResponse,
     SearchOptions
 } from './apis/types'
+import { logInfo, loggerError } from './../index'
 
 export class Internal implements InternalInterface {
     private bot: BilibiliDmBot
@@ -25,6 +28,8 @@ export class Internal implements InternalInterface {
     private userAPI: UserAPI
     private searchAPI: SearchAPI
     private liveAPI: LiveAPI
+    private liveRoomAPI: LiveRoomAPI
+    private liveWebSocketManager: LiveWebSocketManager
 
     constructor(bot: BilibiliDmBot, ctx: Context) {
         this.bot = bot
@@ -33,6 +38,21 @@ export class Internal implements InternalInterface {
         this.userAPI = new UserAPI(bot)
         this.searchAPI = new SearchAPI(bot)
         this.liveAPI = new LiveAPI(bot, ctx)
+        this.liveRoomAPI = new LiveRoomAPI(bot)
+        this.liveWebSocketManager = new LiveWebSocketManager(bot, (data) => {
+            // 发送 bilibili/live-chat 事件
+            ; (this.ctx as any).emit('bilibili/live-chat', data)
+        })
+        // 设置 LiveRoomAPI 实例到 WebSocket 管理器
+        this.liveWebSocketManager.setLiveRoomAPI(this.liveRoomAPI)
+
+        // 添加清理函数，确保插件停用时正确关闭WebSocket连接
+        bot.addCleanup(() => {
+            if (this.liveWebSocketManager) {
+                logInfo(`[${bot.selfId}] 插件停用，清理直播间WebSocket连接`)
+                this.liveWebSocketManager.dispose?.()
+            }
+        })
     }
 
     // #region 用户关注相关API
@@ -312,6 +332,37 @@ export class Internal implements InternalInterface {
      */
     async isUserLive(mid: number): Promise<boolean> {
         return this.liveAPI.isUserLive(mid)
+    }
+
+    // #region 直播间弹幕相关API
+
+    /**
+     * 进入指定直播间
+     * @param roomId 直播间ID
+     */
+    async enterLiveRoom(roomId: number): Promise<void> {
+        return this.liveWebSocketManager.enterRoom(roomId)
+    }
+
+    /**
+     * 退出当前直播间
+     */
+    async leaveLiveRoom(): Promise<void> {
+        return this.liveWebSocketManager.leaveRoom()
+    }
+
+    /**
+     * 获取当前所在的直播间ID
+     */
+    getCurrentLiveRoomId(): number | null {
+        return this.liveWebSocketManager.getCurrentRoomId()
+    }
+
+    /**
+     * 检查是否已连接到直播间
+     */
+    isConnectedToLiveRoom(): boolean {
+        return this.liveWebSocketManager.isConnectedToRoom()
     }
 
 }

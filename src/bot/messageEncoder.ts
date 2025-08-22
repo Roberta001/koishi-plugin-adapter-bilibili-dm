@@ -1,3 +1,4 @@
+// src\bot\messageEncoder.ts
 import { Context, MessageEncoder, h } from 'koishi'
 import { BilibiliDmBot } from './bot'
 import { loggerError } from '../index'

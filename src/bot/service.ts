@@ -2,7 +2,6 @@
 import { BotStatus, logInfo, loggerError, loggerInfo } from '../index'
 import { PluginConfig } from './types'
 import { BilibiliDmBot } from './bot'
-import { BotLoginStatus } from './types'
 import { Context } from 'koishi'
 import QRCode from 'qrcode'
 

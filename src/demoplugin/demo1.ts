@@ -1,3 +1,5 @@
+/* 
+
 import { Context, Schema } from 'koishi'
 
 // import { } from 'koishi-plugin-adapter-bilibili-dm'
@@ -98,3 +100,6 @@ export function apply(ctx: Context, config: Config) {
         ctx.logger.info('Bilibili 动态监听 Demo 插件已停用')
     })
 }
+
+
+*/

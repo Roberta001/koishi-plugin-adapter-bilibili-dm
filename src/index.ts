@@ -10,10 +10,12 @@ import { Context, Logger } from 'koishi'
 
 import { promises as fs, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { getBilibiliErrorMessage } from './bilibiliAPI/temp_error_codes'
 
 export let loggerError: (message: any, ...args: any[]) => void;
 export let loggerInfo: (message: any, ...args: any[]) => void;
 export let logInfo: (message: any, ...args: any[]) => void;
+export let loginfolive: (message: any, ...args: any[]) => void;
 
 let isConsoleEntryAdded = false;
 
@@ -258,7 +260,18 @@ export function apply(ctx: Context, config: PluginConfig) {
       ctx.logger.info(message, ...args);
     };
     loggerError = (message: any, ...args: any[]) => {
-      ctx.logger.error(message, ...args);
+      // 如果传入的是数字，认为是B站错误码
+      if (typeof message === 'number') {
+        const errorMessage = getBilibiliErrorMessage(message);
+        ctx.logger.error(`B站API错误 [${message}]: ${errorMessage}`, ...args);
+      } else {
+        ctx.logger.error(message, ...args);
+      }
+    };
+    loginfolive = (message: any, ...args: any[]) => {
+      if (config.loggerLiveInfo) {
+        logger.info(`[LiveChat] ${message}`, ...args);
+      }
     };
 
     // 创建服务

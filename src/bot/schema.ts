@@ -99,9 +99,13 @@ export const Config: Schema<PluginConfig> =
     }).description('屏蔽设置'),
 
     Schema.object({
-      pollFailureThreshold: Schema.number().default(10).description("连续轮询失败多少次后增加轮询间隔").min(1).max(29).step(1),
-      pollAutoShutdownThreshold: Schema.number().default(30).description("连续轮询失败多少次后自动关闭插件").min(30).max(100).step(1),
+      pollFailureThreshold: Schema.number().default(10).description("连续轮询失败多少次后 增加轮询间隔").min(1).max(29).step(1),
+      pollAutoShutdownThreshold: Schema.number().default(30).description("连续轮询失败多少次后 自动关闭插件").min(30).max(100).step(1),
+    }).description('进阶设置'),
+
+    Schema.object({
       loggerinfo: Schema.boolean().default(false).description("日志调试模式").experimental(),
-    }).description('调试选项'),
+      loggerLiveInfo: Schema.boolean().default(false).description("直播间弹幕 日志调试模式<br>超级刷屏。禁止开发者以外的人开启。").experimental(),
+    }).description('开发调试选项'),
 
   ])

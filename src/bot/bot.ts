@@ -45,6 +45,22 @@ declare module 'koishi' {
       images?: string[];
       cvid?: number;
     }): void;
+    'bilibili/live-chat'(data: {
+      roomId: number;
+      roomInfo: {
+        title: string;
+        uname: string;
+        face: string;
+        area_name: string;
+        online: number;
+      };
+      message: {
+        type: 'danmaku' | 'gift' | 'welcome' | 'guard_buy' | 'super_chat' | 'other';
+        data: any;
+        timestamp: number;
+        raw: any;
+      };
+    }): void;
   }
 }
 
@@ -611,14 +627,14 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
     if (typeof content === 'string') {
       return content
     }
-    
+
     if (Array.isArray(content)) {
       return content.map(item => this.preprocessContent(item)).filter(item => item !== null) as Fragment
     }
-    
+
     if (content && typeof content === 'object' && 'type' in content) {
       const element = content as h
-      
+
       // 如果是 i18n 元素，尝试手动渲染它
       if (element.type === 'i18n') {
         try {
@@ -639,19 +655,19 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
           return h('text', { content: `[${element.attrs?.path || 'i18n'}]` })
         }
       }
-      
+
       // 递归处理子元素
       if (element.children && element.children.length > 0) {
         const processedChildren = element.children
           .map(child => this.preprocessContent(child))
           .filter(child => child !== null) as Fragment[]
-        
+
         return h(element.type, element.attrs, ...processedChildren)
       }
-      
+
       return element
     }
-    
+
     return content
   }
 
@@ -742,5 +758,62 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
     } else {
       this.ctx.logger.warn(`发送撤回消息指令失败给 ${talkerId}，msg_key: ${messageId} `);
     }
+  }
+
+  // #region 直播间相关方法
+
+  /**
+   * 进入指定直播间
+   * @param roomId 直播间ID
+   */
+  async enterLiveRoom(roomId: number): Promise<void> {
+    // 如果已经在其他直播间，先退出
+    const currentRoomId = this.internal.getCurrentLiveRoomId()
+    if (currentRoomId && currentRoomId !== roomId) {
+      logInfo(`[${this.selfId}] 已在直播间 ${currentRoomId} 中，先退出`)
+      await this.leaveLiveRoom()
+    }
+
+    logInfo(`[${this.selfId}] 尝试进入直播间 ${roomId}`)
+    try {
+      await this.internal.enterLiveRoom(roomId)
+      logInfo(`[${this.selfId}] 成功进入直播间 ${roomId}`)
+    } catch (error) {
+      loggerError(`[${this.selfId}] 进入直播间 ${roomId} 失败:`, error)
+      throw error
+    }
+  }
+
+  /**
+   * 退出当前直播间
+   */
+  async leaveLiveRoom(): Promise<void> {
+    const currentRoomId = this.internal.getCurrentLiveRoomId()
+    if (currentRoomId) {
+      logInfo(`[${this.selfId}] 尝试退出直播间 ${currentRoomId}`)
+      try {
+        await this.internal.leaveLiveRoom()
+        logInfo(`[${this.selfId}] 成功退出直播间 ${currentRoomId}`)
+      } catch (error) {
+        loggerError(`[${this.selfId}] 退出直播间 ${currentRoomId} 失败:`, error)
+        throw error
+      }
+    } else {
+      logInfo(`[${this.selfId}] 当前未在任何直播间中`)
+    }
+  }
+
+  /**
+   * 获取当前所在的直播间ID
+   */
+  getCurrentLiveRoomId(): number | null {
+    return this.internal.getCurrentLiveRoomId()
+  }
+
+  /**
+   * 检查是否已连接到直播间
+   */
+  isConnectedToLiveRoom(): boolean {
+    return this.internal.isConnectedToLiveRoom()
   }
 }
