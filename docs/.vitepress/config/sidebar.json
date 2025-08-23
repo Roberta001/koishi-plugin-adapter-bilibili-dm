@@ -9,10 +9,27 @@
             {
                 "text": "快速开始",
                 "link": "/markdown/quick-start"
-            },
+            }
+        ]
+    },
+        {
+        "text": "更多说明",
+        "items": [            
             {
                 "text": "配置指南",
-                "link": "/markdown/configuration"
+                "link": "/markdown/config"
+            },
+            {
+                "text": "常见问题",
+                "link": "/markdown/FAQ"
+            },
+            {
+                "text": "获取帮助",
+                "link": "/markdown/issues"
+            },
+            {
+                "text": "错误码表",
+                "link": "/markdown/errorcodes"
             }
         ]
     },
@@ -21,15 +38,19 @@
         "items": [
             {
                 "text": "API 文档",
-                "link": "/markdown/api"
+                "link": "/markdown/apis"
             },
-            {
-                "text": "常见问题",
-                "link": "/markdown/FAQ"
+                        {
+                "text": "事件文档",
+                "link": "/markdown/events"
             },
             {
                 "text": "开发指南",
                 "link": "/markdown/development"
+            },
+            {
+                "text": "文档开发",
+                "link": "/markdown/development-docs"
             }
         ]
     },
@@ -48,7 +69,7 @@
             },
             {
                 "text": "Koishi 官网",
-                "link": "https://koishi.chat",
+                "link": "https://koishi.chat/zh-CN/guide/",
                 "target": "_blank"
             }
         ]
