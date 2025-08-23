@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/koishi-plugin-adapter-bilibili-dm?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-adapter-bilibili-dm)  [![npm downloads](https://img.shields.io/npm/dm/koishi-plugin-adapter-bilibili-dm)](https://www.npmjs.com/package/koishi-plugin-adapter-bilibili-dm)
 
-Bilibili 私信适配器 for Koishi
+Bilibili Direct Message Adapter For Koishi
 
 ![preview.gif](https://raw.githubusercontent.com/Roberta001/koishi-plugin-adapter-bilibili-dm/refs/heads/docs/screenshot/preview.gif)
 
@@ -15,9 +15,11 @@ Bilibili 私信适配器 for Koishi
 
 ## 主要功能
 
-- ✅ 接收/发送 Bilibili 私信（文本、图片）
+- ✅ 接收/发送 Bilibili 私信
 - ✅ 图片上传到 B站
 - ✅ 获取用户公开信息
+- ✅ 支持监听关注UP的动态
+- ✅ 支持监听直播间弹幕
 - ✅ 支持多开适配器
 
 ## 文档
@@ -29,7 +31,7 @@ Bilibili 私信适配器 for Koishi
 ## 开发
 
 ```bash
-# 克隆项目
+# 在koishi项目模板 克隆项目
 yarn clone Roberta001/koishi-plugin-adapter-bilibili-dm
 
 # 开发模式
