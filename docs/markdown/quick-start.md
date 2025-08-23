@@ -2,21 +2,22 @@
 
 ## 安装插件
 
-### 通过 Koishi 控制台安装
+### 通过 Koishi 控制台安装（通用）
 
 1. 打开 Koishi 控制台
 2. 进入插件市场
-3. 搜索 `adapter-bilibili-dm`
+3. 搜索 
+```bash
+adapter-bilibili-dm
+```
 4. 点击安装
 
 <img src="https://i0.hdslb.com/bfs/openplatform/ccf09979c5dc0174a462f38dc900cd87c91f925b.png" alt="market" referrerpolicy="no-referrer" width="500">
 
-### 通过命令行安装
+### 通过命令行安装（项目模板）
 
 ```bash
 yarn add koishi-plugin-adapter-bilibili-dm
-# 或
-npm install koishi-plugin-adapter-bilibili-dm
 ```
 
 ## 基础配置

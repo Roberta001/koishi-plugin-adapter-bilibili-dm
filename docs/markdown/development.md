@@ -1,4 +1,6 @@
-# 开发指南
+# 适配器开发指南
+
+本页面介绍如何参与 Bilibili Direct Message 适配器的开发和贡献。
 
 ## 环境准备
 
@@ -7,6 +9,8 @@
 - Node.js >= 22.0.0
 - Yarn 或 npm
 - Git
+- TypeScript 基础知识
+- Koishi 框架了解
 
 ### 开发环境搭建
 
@@ -38,3 +42,30 @@ yarn clone Roberta001/koishi-plugin-adapter-bilibili-dm
 yarn dev
 ```
 
+## 项目结构
+
+```bash
+src/
+├── bilibiliAPI/           # B站API封装
+│   ├── index.ts          # API主入口
+│   ├── internal.ts       # 内部API方法
+│   ├── temp_error_codes.ts # 错误码定义
+│   └── apis/             # 各类API实现
+│       ├── dynamic.ts    # 动态相关API
+│       ├── live.ts       # 直播相关API
+│       ├── liveRoom.ts   # 直播间API
+│       ├── liveWebSocket.ts # 直播WebSocket
+│       ├── search.ts     # 搜索API
+│       ├── types.ts      # 类型定义
+│       └── user.ts       # 用户相关API
+├── bot/                  # Bot实现
+│   ├── adapter.ts        # 适配器主类
+│   ├── bot.ts           # Bot实例
+│   ├── http.ts          # HTTP客户端
+│   ├── messageEncoder.ts # 消息编码器
+│   ├── schema.ts        # 配置模式
+│   ├── service.ts       # 服务类
+│   └── types.ts         # 类型定义
+├── demoplugin/          # 示例插件
+└── test/                # 测试文件
+```
