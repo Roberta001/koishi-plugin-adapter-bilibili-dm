@@ -1,6 +1,6 @@
 // src\bilibiliAPI\apis\liveRoom.ts
-import { BilibiliDmBot } from '../../bot/bot'
 import { LiveRoomInfo } from './types'
+import { BilibiliDmBot } from '../../bot/bot'
 import { logInfo, loggerError } from '../../index'
 import { getBilibiliErrorMessage } from '../temp_error_codes'
 

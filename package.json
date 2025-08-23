@@ -1,6 +1,6 @@
 {
   "name": "koishi-plugin-adapter-bilibili-dm",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "Bilibili Direct Message Adapter for Koishi\nBilibili 私信适配器",
   "typings": "lib/index.d.ts",
   "main": "lib/index.js",
@@ -19,7 +19,11 @@
   "bugs": {
     "url": "https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm/issues/new/choose"
   },
-  "homepage": "https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm.git"
+  },
+  "homepage": "https://roberta001.github.io/koishi-plugin-adapter-bilibili-dm",
   "scripts": {
     "build": "tsc -b",
     "pub": "npm publish --registry=https://registry.npmjs.org/ --access=public"
@@ -37,9 +41,9 @@
     "description": {
       "es": "Adaptador de mensajes directos de Bilibili para Koishi",
       "fr": "Adaptateur de messages directs Bilibili pour Koishi",
+      "ja": "Koishi用Bilibiliダイレクトメッセージアダプター",
       "de": "Bilibili Direktnachrichten-Adapter für Koishi",
       "ru": "Адаптер прямых сообщений Bilibili для Koishi",
-      "ja": "Koishi用Bilibiliダイレクトメッセージアダプター",
       "en": "Bilibili Direct Message Adapter for Koishi",
       "zh": "Bilibili 私信适配器"
     },

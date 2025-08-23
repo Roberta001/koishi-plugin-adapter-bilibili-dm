@@ -1,16 +1,16 @@
 //  src\index.ts
+import { getBilibiliErrorMessage } from './bilibiliAPI/temp_error_codes'
 import { DataService } from '@koishijs/plugin-console'
-import { Config } from './bot/schema'
-import { PluginConfig } from './bot/types'
 import { BilibiliDmAdapter } from './bot/adapter'
+import { BilibiliTestPlugin } from './test/test'
 import { BilibiliService } from './bot/service'
+import { PluginConfig } from './bot/types'
 import { BilibiliDmBot } from './bot/bot'
-import { BilibiliTestPlugin } from './test/test';
 import { Context, Logger } from 'koishi'
+import { Config } from './bot/schema'
 
 import { promises as fs, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { getBilibiliErrorMessage } from './bilibiliAPI/temp_error_codes'
 
 export let loggerError: (message: any, ...args: any[]) => void;
 export let loggerInfo: (message: any, ...args: any[]) => void;
@@ -34,7 +34,7 @@ export const usage = `
 ---
 
 <p>Bilibili Direct Message Adapter for Koishi</p>
-<p>➣ <a href="https://github.com/Roberta001/koishi-plugin-adapter-bilibili-dm/tree/main?tab=readme-ov-file#koishi-plugin-adapter-bilibili-dm" target="_blank">点我查看使用说明</a></p>
+<p>➣ <a href="https://roberta001.github.io/koishi-plugin-adapter-bilibili-dm/" target="_blank">点我查看使用说明</a></p>
 
 ---
 `

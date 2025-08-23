@@ -1,7 +1,7 @@
 // src\bot\messageEncoder.ts
 import { Context, MessageEncoder, h } from 'koishi'
-import { BilibiliDmBot } from './bot'
 import { loggerError } from '../index'
+import { BilibiliDmBot } from './bot'
 
 export class BilibiliMessageEncoder extends MessageEncoder<Context, BilibiliDmBot> {
     private textBuffer = ''

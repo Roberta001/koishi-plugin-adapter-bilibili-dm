@@ -1,6 +1,5 @@
 // src\bilibiliAPI\apis\liveWebSocket.ts
 import WebSocket from 'ws'
-import * as zlib from 'node:zlib'
 import { BilibiliDmBot } from '../../bot/bot'
 import { logInfo, loggerError, loginfolive } from '../../index'
 import {
@@ -13,6 +12,8 @@ import {
   WelcomeData,
   LiveChatEventData
 } from './types'
+
+import * as zlib from 'node:zlib'
 
 export class LiveWebSocketManager {
   private ws: WebSocket | null = null

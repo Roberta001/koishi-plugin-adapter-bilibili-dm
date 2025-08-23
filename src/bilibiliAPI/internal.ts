@@ -1,11 +1,12 @@
 // src\bilibiliAPI\internal.ts
-import { BilibiliDmBot } from '../bot/bot'
 import { Context } from 'koishi'
-import { DynamicAPI } from './apis/dynamic'
 import { UserAPI } from './apis/user'
-import { SearchAPI } from './apis/search'
 import { LiveAPI } from './apis/live'
+import { SearchAPI } from './apis/search'
+import { BilibiliDmBot } from '../bot/bot'
+import { DynamicAPI } from './apis/dynamic'
 import { LiveRoomAPI } from './apis/liveRoom'
+import { logInfo, loggerError } from './../index'
 import { LiveWebSocketManager } from './apis/liveWebSocket'
 import {
     DynamicItem,
@@ -19,7 +20,6 @@ import {
     ComprehensiveSearchResponse,
     SearchOptions
 } from './apis/types'
-import { logInfo, loggerError } from './../index'
 
 export class Internal implements InternalInterface {
     private bot: BilibiliDmBot
