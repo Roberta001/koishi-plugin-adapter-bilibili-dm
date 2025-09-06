@@ -67,7 +67,8 @@ declare module 'koishi' {
 
 export class BilibiliDmBot extends Bot<Context, PluginConfig> {
   static inject = ['notifier']
-
+  static MessageEncoder = BilibiliMessageEncoder
+  
   private lastPollTs: number = 0 // 毫秒
   private processedMsgIds: Set<string> = new Set()
   private readonly _maxCacheSize: number
