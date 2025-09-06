@@ -68,7 +68,7 @@ declare module 'koishi' {
 export class BilibiliDmBot extends Bot<Context, PluginConfig> {
   static inject = ['notifier']
   static MessageEncoder = BilibiliMessageEncoder
-  
+
   private lastPollTs: number = 0 // 毫秒
   private processedMsgIds: Set<string> = new Set()
   private readonly _maxCacheSize: number
@@ -611,6 +611,41 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
     }
   }
 
+  /**
+   * 创建私聊频道
+   * @param userId 用户ID
+   * @returns 频道信息
+   */
+  async createDirectChannel(userId: string) {
+    return { id: `private:${userId}`, type: Universal.Channel.Type.DIRECT }
+  }
+
+  /**
+   * 获取登录信息
+   * @returns 登录信息
+   */
+  async getLogin() {
+    return {
+      sn: this.sn,
+      adapter: this.adapterName,
+      user: await this.getSelf(),
+      platform: this.platform,
+      selfId: this.selfId,
+      hidden: this.hidden,
+      status: this.status,
+      features: this.features
+    }
+  }
+
+  /**
+   * 获取好友列表
+   * @returns 好友列表
+   */
+  async getFriendList() {
+    // Bilibili 私信没有传统意义上的好友列表，这里返回空列表
+    return { data: [] }
+  }
+
   async sendMessage(channelId: string, content: Fragment): Promise<string[]> {
     const [type, talkerId] = channelId.split(':')
     if (type !== 'private' || !talkerId) return []
@@ -746,6 +781,99 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
 
     logInfo(`成功获取消息 ${messageId}`)
     return message
+  }
+
+  /**
+   * 获取消息列表
+   * @param channelId 频道ID
+   * @param next 分页参数
+   * @param direction 方向
+   * @param limit 限制数量
+   * @param order 排序
+   * @returns 消息列表
+   */
+  async getMessageList(channelId: string, next?: string, direction: Universal.Direction = 'before', limit?: number, order?: Universal.Order) {
+    logInfo(`尝试获取 ${channelId} 中的消息列表`)
+    const [type, talkerIdStr] = channelId.split(':')
+    const talkerId = Number(talkerIdStr)
+    const sessionType = type === 'private' ? 1 : 0
+
+    // 获取消息列表，这里简化实现，只获取最新的消息
+    const newSessionsData = await this.http.getNewSessions(0)
+    if (!newSessionsData || !newSessionsData.session_list) {
+      loggerError(`获取会话列表失败，无法获取消息列表`)
+      return { data: [] }
+    }
+
+    const sessionInfo = newSessionsData.session_list.find(s => s.talker_id === talkerId && s.session_type === sessionType)
+    if (!sessionInfo) {
+      loggerError(`未找到与 ${channelId} 匹配的会话信息，无法获取消息列表`)
+      return { data: [] }
+    }
+
+    const messageData = await this.http.fetchSessionMessages(talkerId, sessionType, 0)
+    if (!messageData || !messageData.messages) {
+      loggerError(`获取会话 ${talkerId} 的消息失败，无法获取消息列表`)
+      return { data: [] }
+    }
+
+    // 处理消息列表
+    const messages: Universal.Message[] = []
+    for (const msg of messageData.messages) {
+      let contentFragment: Fragment
+      try {
+        const parsedContent = JSON.parse(msg.content)
+        switch (msg.msg_type) {
+          case 1:
+            contentFragment = h.parse(parsedContent.content)
+            break
+          case 2:
+            contentFragment = h('image', { url: parsedContent.url })
+            break
+          case 5:
+            contentFragment = h('text', { content: `[消息已撤回]` })
+            break
+          default:
+            loggerError(`不支持的消息类型: ${msg.msg_type}, 内容: ${msg.content}`)
+            contentFragment = `[Unsupported message type: ${msg.msg_type}]`
+            break
+        }
+      } catch (e) {
+        loggerError(`解析消息内容失败: ${msg.content}, 错误: `, e)
+        contentFragment = '[消息解析失败]'
+      }
+
+      const user = await this.getUser(String(msg.sender_uid))
+
+      messages.push({
+        id: msg.msg_key,
+        elements: h.normalize(contentFragment),
+        content: h.normalize(contentFragment).join(''),
+        user,
+        timestamp: msg.timestamp * 1000,
+        channel: {
+          id: channelId,
+          type: sessionType === 1 ? Universal.Channel.Type.DIRECT : Universal.Channel.Type.TEXT,
+        }
+      })
+    }
+
+    // 根据方向和排序参数处理消息列表
+    if (order === 'asc') {
+      messages.reverse()
+    }
+
+    // 限制返回数量
+    if (limit && messages.length > limit) {
+      if (direction === 'before') {
+        messages.splice(limit)
+      } else {
+        messages.splice(0, messages.length - limit)
+      }
+    }
+
+    logInfo(`成功获取消息列表，共 ${messages.length} 条消息`)
+    return { data: messages }
   }
 
   async deleteMessage(channelId: string, messageId: string): Promise<void> {
