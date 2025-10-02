@@ -888,7 +888,7 @@ export interface InternalInterface {
     searchUpUsers(keyword: string, options?: SearchOptions): Promise<SearchUser[]>
 
     // 直播相关
-    getLiveUsers(): Promise<LiveUser[]>
+    getLiveUsers(): Promise<LiveUser[] | null>
     startLivePolling(interval?: number): void
     stopLivePolling(): void
     isLivePollingActive(): boolean
@@ -896,7 +896,7 @@ export interface InternalInterface {
     getCurrentLiveUsersSummary(): LiveSummary[]
     manualLiveCheck(): Promise<void>
     getUserLiveStatus(mid: number): Promise<LiveUser | null>
-    isUserLive(mid: number): Promise<boolean>
+    isUserLive(mid: number): Promise<boolean | null>
 }
 
 // 直播间相关类型定义

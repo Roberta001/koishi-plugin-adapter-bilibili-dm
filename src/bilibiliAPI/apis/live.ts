@@ -113,9 +113,9 @@ export class LiveAPI {
 
     /**
      * 获取当前正在直播的UP主列表
-     * @returns Promise<LiveUser[]> 正在直播的UP主列表
+     * @returns Promise<LiveUser[] | null> 正在直播的UP主列表，网络错误时返回null
      */
-    async getLiveUsers(): Promise<LiveUser[]> {
+    async getLiveUsers(): Promise<LiveUser[] | null> {
         logInfo('尝试获取当前正在直播的UP主列表')
         try {
             // 检查上下文和HTTP客户端是否仍然活跃
@@ -156,7 +156,8 @@ export class LiveAPI {
                 return []
             }
             loggerError('获取直播列表时发生错误: ', error)
-            return []
+            // 网络错误时返回null，表示无法确定当前状态
+            return null
         }
     }
 
@@ -250,6 +251,12 @@ export class LiveAPI {
             // 获取当前直播列表
             const liveUsers = await this.getLiveUsers()
 
+            // 如果获取失败，不进行初始化
+            if (liveUsers === null) {
+                logInfo('由于网络错误无法获取直播列表，跳过初始化')
+                return
+            }
+
             if (liveUsers.length === 0) {
                 logInfo('初始化完成：当前没有UP主在直播')
                 this.currentLiveUsers = []
@@ -295,6 +302,13 @@ export class LiveAPI {
 
             // 获取当前直播列表
             const currentLiveUsers = await this.getLiveUsers()
+
+            // 如果获取失败，跳过本次检查
+            if (currentLiveUsers === null) {
+                logInfo('由于网络错误无法获取直播列表，跳过本次状态检查')
+                return
+            }
+
             const currentSummaries = currentLiveUsers.map(user => this.liveUserToSummary(user))
 
             logInfo(`获取到 ${currentSummaries.length} 个正在直播的UP主，开始比对...`)
@@ -559,14 +573,22 @@ export class LiveAPI {
      */
     async getUserLiveStatus(mid: number): Promise<LiveUser | null> {
         const liveUsers = await this.getLiveUsers()
+        if (liveUsers === null) {
+            // 网络错误时无法确定状态
+            return null
+        }
         return liveUsers.find(user => user.mid === mid) || null
     }
 
     /**
      * 检查指定UP主是否正在直播
      */
-    async isUserLive(mid: number): Promise<boolean> {
-        const liveStatus = await this.getUserLiveStatus(mid)
-        return liveStatus !== null
+    async isUserLive(mid: number): Promise<boolean | null> {
+        const liveUsers = await this.getLiveUsers()
+        if (liveUsers === null) {
+            // 网络错误时无法确定状态
+            return null
+        }
+        return liveUsers.some(user => user.mid === mid)
     }
 }
