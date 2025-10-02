@@ -1,7 +1,6 @@
 //  src\http.ts
 import { BiliApiResponse, MyInfoData, QrCodeData, QrCodePollResult, UploadImageData, WbiKeys, NavWbiImg, NewSessionsData, SessionMessagesData, BiliSendMessageResponseData } from './types'
 import { logInfo, loggerError, loggerInfo } from '../index'
-import { AxiosRequestHeaders } from 'axios'
 import { Context, Quester } from 'koishi'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -104,7 +103,7 @@ export class HttpClient {
 
     // 更新默认cookie
     if (this.http.config.headers) {
-      (this.http.config.headers as AxiosRequestHeaders)['Cookie'] = cookieString
+      (this.http.config.headers as Record<string, string>)['Cookie'] = cookieString
     }
     logInfo(`[${this.selfId}] 成功设置cookie，长度: ${cookieString.length}`)
   }
