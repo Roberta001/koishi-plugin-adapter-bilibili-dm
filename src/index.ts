@@ -6,7 +6,7 @@ import { BilibiliTestPlugin } from './test/test'
 import { BilibiliService } from './bot/service'
 import { PluginConfig } from './bot/types'
 import { BilibiliDmBot } from './bot/bot'
-import { Context, Logger } from 'koishi'
+import { Context, Logger, sleep } from 'koishi'
 import { Config } from './bot/schema'
 
 import { promises as fs, existsSync } from 'node:fs'
@@ -243,12 +243,12 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>> {
 
 export function apply(ctx: Context, config: PluginConfig) {
 
-  // 开发模式且非依赖安装时 加载测试插件
-  if (process.env.NODE_ENV === 'development' && !__dirname.includes('node_modules')) {
-    ctx.plugin(BilibiliTestPlugin)
-  }
+  ctx.on('ready', async () => {
 
-  ctx.on('ready', () => {
+    if (process.env.NODE_ENV === 'development' && !__dirname.includes('node_modules')) {
+      await sleep(1 * 1000);  // 神秘步骤，可以保佑dev模式
+      ctx.plugin(BilibiliTestPlugin)
+    }
 
     // 初始化全局函数
     logInfo = (message: any, ...args: any[]) => {
