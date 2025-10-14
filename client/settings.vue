@@ -93,7 +93,6 @@ const PLUGIN_NAME = 'koishi-plugin-adapter-bilibili-dm';
 const data = computed(() => {
   // 名称不匹配，返回 null，阻止组件渲染
   if (!local.value || local.value.name !== PLUGIN_NAME) {
-    console.warn(`[Bilibili DM] 当前插件名称 '${local.value?.name}' 不匹配预期 '${PLUGIN_NAME}'，跳过数据加载。`);
     return null;
   }
 
