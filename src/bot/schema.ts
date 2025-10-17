@@ -92,9 +92,9 @@ export const Config: Schema<PluginConfig> =
     Schema.object({
       nestedblocked: Schema.object({
         blockedUids: Schema.array(Schema.object({
-          name: Schema.string().description('名称（仅用于标记）'),
+          name: Schema.string().description('名称（仅用于标识）'),
           uid: Schema.string().description('UID'),
-        })).role('table').description('用户UID').default(defaultblockedUids),
+        })).role('table').description('请在右列填入用户UID。<br>通配符 `*` 代表所以用户，如需屏蔽所有用户，请填入 `*` 。').default(defaultblockedUids),
       }).collapse().description('私信屏蔽的UID列表'),
     }).description('屏蔽设置'),
 

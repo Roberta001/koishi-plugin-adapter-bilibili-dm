@@ -8,6 +8,7 @@ import { logInfo, loggerError } from '../index'
 import { PrivateMessage } from './types'
 import { PluginConfig } from './types'
 import { HttpClient } from './http'
+import { shouldBlockMessage } from './utils'
 
 declare module 'koishi' {
   interface Context {
@@ -429,10 +430,10 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
   private async adaptMessage(msg: PrivateMessage, sessionType: number, talkerId: number) {
     if (String(msg.sender_uid) === this.selfId) return
 
-    // 屏蔽的UID
+    // 屏蔽的UID检查
     const senderUid = msg.sender_uid;
-    if (this.pluginConfig.nestedblocked.blockedUids && this.pluginConfig.nestedblocked.blockedUids.some(blocked => blocked.uid === senderUid)) {
-      logInfo(`屏蔽来自UID ${senderUid} 的消息。`)
+    if (this.pluginConfig.nestedblocked.blockedUids &&
+      shouldBlockMessage(senderUid, this.pluginConfig.nestedblocked.blockedUids)) {
       return
     }
 
