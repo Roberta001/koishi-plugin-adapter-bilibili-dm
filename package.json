@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-adapter-bilibili-dm",
   "version": "2.3.9",
-  "description": "Bilibili Direct Message Adapter for Koishi\nBilibili 私信适配器",
+  "description": "Bilibili Adapter for Koishi\n哔哩哔哩适配器",
   "typings": "lib/index.d.ts",
   "main": "lib/index.js",
   "files": [
@@ -39,13 +39,13 @@
   ],
   "koishi": {
     "description": {
-      "es": "Adaptador de mensajes directos de Bilibili para Koishi",
-      "fr": "Adaptateur de messages directs Bilibili pour Koishi",
-      "ja": "Koishi用Bilibiliダイレクトメッセージアダプター",
-      "de": "Bilibili Direktnachrichten-Adapter für Koishi",
-      "ru": "Адаптер прямых сообщений Bilibili для Koishi",
-      "en": "Bilibili Direct Message Adapter for Koishi",
-      "zh": "Bilibili 私信适配器"
+      "es": "Adaptador de Bilibili para Koishi",
+      "fr": "Adaptateur Bilibili pour Koishi",
+      "ja": "Koishi用Bilibiliアダプター",
+      "de": "Bilibili-Adapter für Koishi",
+      "ru": "Адаптер Bilibili для Koishi",
+      "en": "Bilibili Adapter for Koishi",
+      "zh": "哔哩哔哩适配器"
     },
     "preview": true,
     "hidden": false,
