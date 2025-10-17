@@ -282,7 +282,7 @@ export function apply(ctx: Context, config: PluginConfig)
     if (process.env.NODE_ENV === 'development' && !__dirname.includes('node_modules'))
     {
       await sleep(1 * 1000);  // 神秘步骤，可以保佑dev模式
-      ctx.plugin(BilibiliTestPlugin);
+      // ctx.plugin(BilibiliTestPlugin);
     }
 
     // 初始化全局函数
