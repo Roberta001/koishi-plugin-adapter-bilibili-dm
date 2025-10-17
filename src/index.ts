@@ -28,7 +28,7 @@ export const reusable = true
 export const filter = false
 export { Config }
 
-const logger = new Logger(`Development:${name}-dev`)
+const logger = new Logger(`DEV:${name}`)
 
 export const usage = `
 ---
@@ -109,12 +109,12 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>> {
     this.serviceId = serviceId
     this.currentBot = config.selfId
 
-    logInfo(`[${config.selfId}] BilibiliLauncher构造函数，serviceId: ${serviceId}, currentBot: ${this.currentBot}`)
+    logInfo(`BilibiliLauncher构造函数，serviceId: ${serviceId}, currentBot: ${this.currentBot}`)
 
     const sessionFile = resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm', `${config.selfId}.cookie.json`)
     const hasCacheFile = existsSync(sessionFile)
 
-    logInfo(`[${config.selfId}] BilibiliLauncher初始化，缓存文件存在: ${hasCacheFile}`)
+    logInfo(`BilibiliLauncher初始化，缓存文件存在: ${hasCacheFile}`)
 
     // 初始化状态
     if (hasCacheFile) {
@@ -123,14 +123,14 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>> {
         selfId: config.selfId,
         message: '正在从缓存加载登录信息...'
       }
-      logInfo(`[${config.selfId}] 发现缓存文件，初始化状态为"正在从缓存加载登录信息..."`)
+      logInfo(`发现缓存文件，初始化状态为"正在从缓存加载登录信息..."`)
     } else {
       this.consoleMessages[config.selfId] = {
         status: 'offline',
         selfId: config.selfId,
         message: '机器人未登录，请点击登录按钮'
       }
-      logInfo(`[${config.selfId}] 未发现缓存文件，初始化状态为"机器人未登录"`)
+      logInfo(`未发现缓存文件，初始化状态为"机器人未登录"`)
     }
 
     // 立即刷新前端
@@ -139,7 +139,7 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>> {
     // 监听特定于selfId的状态更新事件
     const statusEventName = `bilibili-dm-${config.selfId}/status-update`;
     ctx.on(statusEventName as keyof import('koishi').Events, (status: BotStatus) => {
-      logInfo(`[${config.selfId}] 收到特定实例状态更新通知: ${status.selfId} -> ${status.status}`)
+      logInfo(`收到特定实例状态更新通知: ${status.selfId} -> ${status.status}`)
 
       if (status.selfId === config.selfId) {
         this.consoleMessages[status.selfId] = {
@@ -149,13 +149,13 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>> {
         // 刷新前端
         this.refresh()
       } else {
-        logInfo(`[${config.selfId}] 忽略非本实例的状态更新: ${status.selfId}`)
+        logInfo(`忽略非本实例的状态更新: ${status.selfId}`)
       }
     })
 
     ctx.on('bilibili-dm/status-update', (status: BotStatus) => {
       if (status.selfId === config.selfId) {
-        logInfo(`[${config.selfId}] 收到通用状态更新通知: ${status.selfId} -> ${status.status}`)
+        logInfo(`收到通用状态更新通知: ${status.selfId} -> ${status.status}`)
 
         // 更新控制台消息
         this.consoleMessages[status.selfId] = {
@@ -170,7 +170,7 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>> {
 
     // 前端发来的登录请求
     const loginEventName = `bilibili-dm-${config.selfId}/start-login`;
-    logInfo(`[${config.selfId}] 注册登录事件监听器: ${loginEventName}`)
+    logInfo(`注册登录事件监听器: ${loginEventName}`)
 
     ctx.console.addListener(loginEventName as any, async (data: { selfId: string }) => {
       const selfId = data.selfId || config.selfId
@@ -212,7 +212,7 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>> {
     const statusData = this.consoleMessages;
 
     // 记录当前获取的状态
-    logInfo(`[${this.currentBot}] 前端请求状态数据，当前状态: ${JSON.stringify(statusData[this.currentBot]?.status)}, 消息: ${statusData[this.currentBot]?.message}`)
+    logInfo(`前端请求状态数据，当前状态: ${JSON.stringify(statusData[this.currentBot]?.status)}, 消息: ${statusData[this.currentBot]?.message}`)
 
     // 如果有二维码，记录日志
     Object.values(statusData).forEach(status => {
@@ -253,7 +253,7 @@ export function apply(ctx: Context, config: PluginConfig) {
     // 初始化全局函数
     logInfo = (message: any, ...args: any[]) => {
       if (config.loggerinfo) {
-        logger.info(message, ...args);
+        logger.info(`[${config.selfId}] `, message, ...args);
       }
     };
     loggerInfo = (message: any, ...args: any[]) => {
@@ -290,7 +290,7 @@ export function apply(ctx: Context, config: PluginConfig) {
     ctx.plugin({
       name: `bilibili-launcher-${config.selfId}`,
       apply: (ctx) => {
-        logInfo(`[${config.selfId}] 创建BilibiliLauncher实例，selfId: ${config.selfId}`)
+        logInfo(`创建BilibiliLauncher实例，selfId: ${config.selfId}`)
         return new BilibiliLauncher(ctx, service, config)
       }
     })
@@ -302,7 +302,7 @@ export function apply(ctx: Context, config: PluginConfig) {
 
     ctx.on('dispose', () => {
       isConsoleEntryAdded = false;
-      logInfo(`[${config.selfId}] 插件正在停用，执行清理操作`)
+      logInfo(`插件正在停用，执行清理操作`)
 
       try {
         // 标记服务为已停用状态
@@ -312,21 +312,21 @@ export function apply(ctx: Context, config: PluginConfig) {
         const botToStop = ctx.bots.find(bot => bot.platform === 'bilibili' && bot.selfId === config.selfId);
 
         if (botToStop) {
-          logInfo(`[${config.selfId}] 正在停止当前插件实例对应的机器人: ${botToStop.selfId}`);
+          logInfo(`正在停止当前插件实例对应的机器人: ${botToStop.selfId}`);
           try {
             botToStop.stop();
             botToStop.offline(); // 确保机器人状态为离线
-            logInfo(`[${config.selfId}] 机器人 ${botToStop.selfId} 已停止并设置为离线`);
+            logInfo(`机器人 ${botToStop.selfId} 已停止并设置为离线`);
             botToStop.dispose(); // 彻底移除机器人实例
-            logInfo(`[${config.selfId}] 机器人 ${botToStop.selfId} 已被彻底移除`);
+            logInfo(`机器人 ${botToStop.selfId} 已被彻底移除`);
           } catch (err) {
             ctx.logger.error(`[${config.selfId}] 停止机器人 ${botToStop.selfId} 失败: ${err.message}`);
           }
         } else {
-          logInfo(`[${config.selfId}] 未找到当前插件实例对应的机器人，无需停止。`);
+          logInfo(`未找到当前插件实例对应的机器人，无需停止。`);
         }
 
-        logInfo(`[${config.selfId}] 插件停用完成`);
+        logInfo(`插件停用完成`);
       } catch (err) {
         ctx.logger.error(`[${config.selfId}] 插件停用过程中发生错误: ${err.message}`)
       }

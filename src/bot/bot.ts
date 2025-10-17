@@ -105,7 +105,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
 
     this.internal = new Internal(this, this.ctx);
 
-    logInfo(`[${this.selfId}] BilibiliDmBot实例创建完成，准备启动`)
+    logInfo(`BilibiliDmBot实例创建完成，准备启动`)
   }
 
   addCleanup(fn: () => void) {
@@ -114,7 +114,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
 
   private handlePollSuccess() {
     if (this.consecutiveFailures > 0) {
-      logInfo(`[${this.selfId}] 轮询恢复正常，重置失败计数 (之前连续失败 ${this.consecutiveFailures} 次)`)
+      logInfo(`轮询恢复正常，重置失败计数 (之前连续失败 ${this.consecutiveFailures} 次)`)
       this.consecutiveFailures = 0
       this.currentPollInterval = this.pluginConfig.pollInterval
     }
@@ -181,23 +181,22 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
   }
   // #region basic API
   private startPolling(): void {
-    logInfo(`[${this.selfId
-      }] 开始设置轮询定时器...`)
+    logInfo(`开始设置轮询定时器...`)
 
     if (!this.http.hasCookies()) {
-      logInfo(`[${this.selfId}]警告：启动轮询时cookie未验证，将延迟启动轮询`)
+      logInfo(`警告：启动轮询时cookie未验证，将延迟启动轮询`)
       try {
         this.ctx.setTimeout(() => {
           if (!this.http.isDisposed && !this.isStopping) {
-            logInfo(`[${this.selfId}] 延迟后再次尝试启动轮询...`)
+            logInfo(`延迟后再次尝试启动轮询...`)
             this.startPolling()
           } else {
-            logInfo(`[${this.selfId}]插件已停用或正在停止，跳过延迟后的轮询启动`)
+            logInfo(`插件已停用或正在停止，跳过延迟后的轮询启动`)
           }
         }, 5000)
       } catch (err) {
         if (err.code === 'INACTIVE_EFFECT') {
-          logInfo(`[${this.selfId}]上下文已不活跃，跳过设置延迟轮询定时器`)
+          logInfo(`上下文已不活跃，跳过设置延迟轮询定时器`)
           this.http.isDisposed = true
         } else {
           loggerError(`[${this.selfId}]设置延迟轮询定时器时出错: `, err)
@@ -206,32 +205,32 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
       return
     }
 
-    logInfo(`[${this.selfId}]cookie已验证，开始设置轮询定时器`)
+    logInfo(`cookie已验证，开始设置轮询定时器`)
     this.startContinuousPolling()
   }
 
   private startDynamicPolling(): void {
     if (!this.pluginConfig.enableDynamicPolling) {
-      logInfo(`[${this.selfId}] 动态监听已禁用`)
+      logInfo(`动态监听已禁用`)
       return
     }
 
-    logInfo(`[${this.selfId}] 开始设置动态监听定时器...`)
+    logInfo(`开始设置动态监听定时器...`)
 
     if (!this.http.hasCookies()) {
-      logInfo(`[${this.selfId}]警告：启动动态监听时cookie未验证，将延迟启动动态监听`)
+      logInfo(`警告：启动动态监听时cookie未验证，将延迟启动动态监听`)
       try {
         this.ctx.setTimeout(() => {
           if (!this.http.isDisposed && !this.isStopping) {
-            logInfo(`[${this.selfId}] 延迟后再次尝试启动动态监听...`)
+            logInfo(`延迟后再次尝试启动动态监听...`)
             this.startDynamicPolling()
           } else {
-            logInfo(`[${this.selfId}]插件已停用或正在停止，跳过延迟后的动态监听启动`)
+            logInfo(`插件已停用或正在停止，跳过延迟后的动态监听启动`)
           }
         }, 5000)
       } catch (err) {
         if (err.code === 'INACTIVE_EFFECT') {
-          logInfo(`[${this.selfId}]上下文已不活跃，跳过设置延迟动态监听定时器`)
+          logInfo(`上下文已不活跃，跳过设置延迟动态监听定时器`)
         } else {
           loggerError(`[${this.selfId}]设置延迟动态监听定时器时出错: `, err)
         }
@@ -243,32 +242,32 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
     const dynamicIntervalSeconds = this.pluginConfig.dynamicPollInterval || 60
     const dynamicInterval = dynamicIntervalSeconds * 1000
 
-    logInfo(`[${this.selfId}]cookie已验证，启动动态监听，轮询间隔: ${dynamicIntervalSeconds}秒 (${dynamicInterval}ms)`)
+    logInfo(`cookie已验证，启动动态监听，轮询间隔: ${dynamicIntervalSeconds}秒 (${dynamicInterval}ms)`)
     this.internal.startDynamicPolling(dynamicInterval)
   }
 
   private startLivePolling(): void {
     if (!this.pluginConfig.enableLivePolling) {
-      logInfo(`[${this.selfId}] 直播监听已禁用`)
+      logInfo(`直播监听已禁用`)
       return
     }
 
-    logInfo(`[${this.selfId}] 开始设置直播监听定时器...`)
+    logInfo(`开始设置直播监听定时器...`)
 
     if (!this.http.hasCookies()) {
-      logInfo(`[${this.selfId}]警告：启动直播监听时cookie未验证，将延迟启动直播监听`)
+      logInfo(`警告：启动直播监听时cookie未验证，将延迟启动直播监听`)
       try {
         this.ctx.setTimeout(() => {
           if (!this.http.isDisposed && !this.isStopping) {
-            logInfo(`[${this.selfId}] 延迟后再次尝试启动直播监听...`)
+            logInfo(`延迟后再次尝试启动直播监听...`)
             this.startLivePolling()
           } else {
-            logInfo(`[${this.selfId}]插件已停用或正在停止，跳过延迟后的直播监听启动`)
+            logInfo(`插件已停用或正在停止，跳过延迟后的直播监听启动`)
           }
         }, 5000)
       } catch (err) {
         if (err.code === 'INACTIVE_EFFECT') {
-          logInfo(`[${this.selfId}]上下文已不活跃，跳过设置延迟直播监听定时器`)
+          logInfo(`上下文已不活跃，跳过设置延迟直播监听定时器`)
         } else {
           loggerError(`[${this.selfId}]设置延迟直播监听定时器时出错: `, err)
         }
@@ -280,7 +279,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
     const liveIntervalSeconds = this.pluginConfig.livePollInterval || 30
     const liveInterval = liveIntervalSeconds * 1000
 
-    logInfo(`[${this.selfId}]cookie已验证，启动直播监听，轮询间隔: ${liveIntervalSeconds}秒 (${liveInterval}ms)`)
+    logInfo(`cookie已验证，启动直播监听，轮询间隔: ${liveIntervalSeconds}秒 (${liveInterval}ms)`)
     this.internal.startLivePolling(liveInterval)
   }
 
@@ -299,7 +298,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
           await this.poll()
         } catch (err) {
           if (err.code === 'INACTIVE_EFFECT') {
-            logInfo(`[${this.selfId}]关闭过程中，跳过轮询。`)
+            logInfo(`关闭过程中，跳过轮询。`)
             return
           }
           loggerError(`[${this.selfId}]轮询过程中发生错误: `, err)
@@ -310,7 +309,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
       this.addCleanup(() => {
         try {
           intervalId()
-          logInfo(`[${this.selfId}]轮询定时器已清除`)
+          logInfo(`轮询定时器已清除`)
         } catch (err) {
           loggerError(`[${this.selfId}]清除轮询定时器时出错: `, err)
         }
@@ -322,7 +321,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
 
   private async poll() {
     if (!this.online || this.isStopping) {
-      logInfo(`[${this.selfId}]机器人不在线或正在停止，跳过轮询`)
+      logInfo(`机器人不在线或正在停止，跳过轮询`)
       return
     }
 
@@ -331,7 +330,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
       const newSessionsData = await this.http.getNewSessions(this.lastPollTs)
 
       if (this.isStopping) {
-        logInfo(`[${this.selfId}]机器人正在停止，在获取会话数据后跳过后续轮询处理。`)
+        logInfo(`机器人正在停止，在获取会话数据后跳过后续轮询处理。`)
         return
       }
 
@@ -352,7 +351,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
 
       for (const session of newSessionsData.session_list) {
         if (session.unread_count > 0) {
-          logInfo(`[${this.selfId}] 发现用户 ${session.talker_id} 的新消息(未读数: ${session.unread_count})`)
+          logInfo(`发现用户 ${session.talker_id} 的新消息(未读数: ${session.unread_count})`)
           const messageData = await this.http.fetchSessionMessages(
             session.talker_id,
             session.session_type,
@@ -360,16 +359,16 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
           )
 
           if (this.isStopping) {
-            logInfo(`[${this.selfId}]机器人正在停止，在获取消息数据后跳过后续轮询处理。`)
+            logInfo(`机器人正在停止，在获取消息数据后跳过后续轮询处理。`)
             return
           }
 
           if (messageData?.messages) {
-            logInfo(`[${this.selfId}] 获取到 ${messageData.messages.length} 条消息`)
+            logInfo(`获取到 ${messageData.messages.length} 条消息`)
             for (const msg of messageData.messages.reverse()) {
               // 如果开启了忽略离线消息，并且消息时间戳早于机器人上线时间，则跳过
               if (this.pluginConfig.ignoreOfflineMessages && msg.timestamp * 1000 < this.botOnlineTimestamp) {
-                logInfo(`[${this.selfId}]跳过离线期间的消息(UID: ${msg.sender_uid}, MsgKey: ${msg.msg_key})`);
+                logInfo(`跳过离线期间的消息(UID: ${msg.sender_uid}, MsgKey: ${msg.msg_key})`);
                 continue;
               }
               this.adaptMessage(msg, session.session_type, session.talker_id)
@@ -382,7 +381,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
       this.lastPollTs = pollTs;
     } catch (error) {
       if (error.code === 'INACTIVE_EFFECT') {
-        logInfo(`[${this.selfId}]关闭过程中，跳过轮询。`)
+        logInfo(`关闭过程中，跳过轮询。`)
         return
       }
       loggerError(`[${this.selfId}]轮询过程中发生错误: % o`, error)
@@ -523,22 +522,22 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
   }
 
   async start() {
-    logInfo(`[${this.selfId}] 开始启动机器人...`)
+    logInfo(`开始启动机器人...`)
     await super.start()
 
     if (this.pluginConfig.ignoreOfflineMessages) {
       this.botOnlineTimestamp = Date.now(); // 记录机器人上线时间 (毫秒)
-      logInfo(`[${this.selfId}]已开启“不响应机器人离线的未读消息”功能，机器人上线时间戳已记录。`);
+      logInfo(`已开启“不响应机器人离线的未读消息”功能，机器人上线时间戳已记录。`);
     }
     // 无论是否忽略离线消息，首次轮询都从当前时间开始，避免处理启动前的旧会话
     this.lastPollTs = Date.now(); // 毫秒
-    logInfo(`[${this.selfId}] lastPollTs 已设置为当前时间，确保从最新会话开始轮询。`);
+    logInfo(`lastPollTs 已设置为当前时间，确保从最新会话开始轮询。`);
 
     if (!this.http.hasCookies()) {
-      logInfo(`[${this.selfId}]警告：启动机器人时cookie未设置，可能导致轮询失败`)
+      logInfo(`警告：启动机器人时cookie未设置，可能导致轮询失败`)
       this.status = Universal.Status.DISCONNECT
     } else {
-      logInfo(`[${this.selfId}]cookie已设置，准备开始轮询`)
+      logInfo(`cookie已设置，准备开始轮询`)
       this.status = Universal.Status.ONLINE
     }
 
@@ -547,30 +546,30 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
       this.startDynamicPolling()
       this.startLivePolling()
 
-      logInfo(`[${this.selfId}]轮询已启动，机器人状态: ${this.status}`)
+      logInfo(`轮询已启动，机器人状态: ${this.status}`)
     }, 2000)
 
-    logInfo(`[${this.selfId}]机器人启动完成，状态: ${this.status}`)
+    logInfo(`机器人启动完成，状态: ${this.status}`)
   }
 
   async stop() {
     this.isStopping = true
     this.status = Universal.Status.DISCONNECT
-    logInfo(`[${this.selfId}] 正在停止机器人...`)
+    logInfo(`正在停止机器人...`)
 
     // 停止动态监听
     if (this.internal.isPollingActive()) {
-      logInfo(`[${this.selfId}] 停止动态监听`);
+      logInfo(`停止动态监听`);
       this.internal.stopDynamicPolling();
     }
 
     // 停止直播监听
     if (this.internal.isLivePollingActive()) {
-      logInfo(`[${this.selfId}] 停止直播监听`);
+      logInfo(`停止直播监听`);
       this.internal.stopLivePolling();
     }
 
-    logInfo(`[${this.selfId}]执行清理函数，数量: ${this.cleanupFunctions.length} `)
+    logInfo(`执行清理函数，数量: ${this.cleanupFunctions.length} `)
     for (const cleanup of this.cleanupFunctions) {
       try {
         cleanup()
@@ -901,14 +900,14 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
     // 如果已经在其他直播间，先退出
     const currentRoomId = this.internal.getCurrentLiveRoomId()
     if (currentRoomId && currentRoomId !== roomId) {
-      logInfo(`[${this.selfId}] 已在直播间 ${currentRoomId} 中，先退出`)
+      logInfo(`已在直播间 ${currentRoomId} 中，先退出`)
       await this.leaveLiveRoom()
     }
 
-    logInfo(`[${this.selfId}] 尝试进入直播间 ${roomId}`)
+    logInfo(`尝试进入直播间 ${roomId}`)
     try {
       await this.internal.enterLiveRoom(roomId)
-      logInfo(`[${this.selfId}] 成功进入直播间 ${roomId}`)
+      logInfo(`成功进入直播间 ${roomId}`)
     } catch (error) {
       loggerError(`[${this.selfId}] 进入直播间 ${roomId} 失败:`, error)
       throw error
@@ -921,16 +920,16 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
   async leaveLiveRoom(): Promise<void> {
     const currentRoomId = this.internal.getCurrentLiveRoomId()
     if (currentRoomId) {
-      logInfo(`[${this.selfId}] 尝试退出直播间 ${currentRoomId}`)
+      logInfo(`尝试退出直播间 ${currentRoomId}`)
       try {
         await this.internal.leaveLiveRoom()
-        logInfo(`[${this.selfId}] 成功退出直播间 ${currentRoomId}`)
+        logInfo(`成功退出直播间 ${currentRoomId}`)
       } catch (error) {
         loggerError(`[${this.selfId}] 退出直播间 ${currentRoomId} 失败:`, error)
         throw error
       }
     } else {
-      logInfo(`[${this.selfId}] 当前未在任何直播间中`)
+      logInfo(`当前未在任何直播间中`)
     }
   }
 

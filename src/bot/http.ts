@@ -33,7 +33,7 @@ export class HttpClient {
     defaultValue: T
   ): Promise<T> {
     if (this.isDisposed) {
-      logInfo(`[${this.selfId}] HttpClient 实例已停用，跳过HTTP请求。`);
+      logInfo(`HttpClient 实例已停用，跳过HTTP请求。`);
       return defaultValue;
     }
 
@@ -43,7 +43,7 @@ export class HttpClient {
         this.ctx.setTimeout(() => { }, 0);
       } catch (err) {
         if (err.code === 'INACTIVE_EFFECT') {
-          logInfo(`[${this.selfId}] 上下文已不活跃，跳过HTTP请求`);
+          logInfo(`上下文已不活跃，跳过HTTP请求`);
           this.isDisposed = true;
           return defaultValue;
         }
@@ -51,7 +51,7 @@ export class HttpClient {
 
       // 再次检查
       if (this.isDisposed) {
-        logInfo(`[${this.selfId}] HttpClient 实例已停用，跳过HTTP请求。`);
+        logInfo(`HttpClient 实例已停用，跳过HTTP请求。`);
         return defaultValue;
       }
 
@@ -61,7 +61,6 @@ export class HttpClient {
       } catch (httpError) {
         if (httpError.message?.includes('context disposed') ||
           httpError.code === 'INACTIVE_EFFECT') {
-          logInfo(`[${this.selfId}] 上下文已停用，HTTP请求被中断: ${httpError.message}`);
           this.isDisposed = true;
           return defaultValue;
         }
@@ -79,7 +78,7 @@ export class HttpClient {
     const effectiveConfig = config || (ctx.bilibili_dm_service)?.config || {};
     this.avatarBase64 = effectiveConfig.avatarBase64 !== undefined ? effectiveConfig.avatarBase64 : true;
 
-    logInfo(`[${this.selfId}] HttpClient初始化，avatarBase64=${this.avatarBase64}`);
+    logInfo(`HttpClient初始化，avatarBase64=${this.avatarBase64}`);
     logInfo(`HttpClient初始化，avatarBase64=${this.avatarBase64}, selfId=${this.selfId}`);
     this.http = ctx.http.extend({
       headers: {
@@ -105,7 +104,7 @@ export class HttpClient {
     if (this.http.config.headers) {
       (this.http.config.headers as Record<string, string>)['Cookie'] = cookieString
     }
-    logInfo(`[${this.selfId}] 成功设置cookie，长度: ${cookieString.length}`)
+    logInfo(`成功设置cookie，长度: ${cookieString.length}`)
   }
 
   // 检查cookie是否已设置并验证
@@ -116,7 +115,7 @@ export class HttpClient {
   // 设置cookie验证标志
   setCookieVerified(verified: boolean): void {
     this.cookieVerified = verified
-    logInfo(`[${this.selfId}] Cookie验证状态设置为: ${verified}`)
+    logInfo(`Cookie验证状态设置为: ${verified}`)
   }
 
   // #region WBI Signing
@@ -195,7 +194,7 @@ export class HttpClient {
     return this.safeRequest(async () => {
       const res = await this.http.get<BiliApiResponse<QrCodeData>>('https://passport.bilibili.com/x/passport-login/web/qrcode/generate');
       if (res.code === 0 && res.data) return res.data;
-      logInfo(`[${this.selfId}] 获取二维码失败: ${res.message}`);
+      logInfo(`获取二维码失败: ${res.message}`);
       return null;
     }, '获取二维码数据时发生网络错误', null);
   }
@@ -224,7 +223,7 @@ export class HttpClient {
 
   async getMyInfo(): Promise<{ nickname: string, avatar: string, isValid: boolean }> {
     return this.safeRequest(async () => {
-      logInfo(`[${this.selfId}] 正在验证cookie有效性，请求用户信息...`);
+      logInfo(`正在验证cookie有效性，请求用户信息...`);
       const res = await this.http.get<BiliApiResponse<MyInfoData>>('https://api.bilibili.com/x/space/myinfo');
 
       if (res.code !== 0) {
@@ -234,7 +233,7 @@ export class HttpClient {
       }
 
       if (res.code === 0 && res.data) {
-        logInfo(`[${this.selfId}] 验证cookie成功，用户名: ${res.data.name}`);
+        logInfo(`验证cookie成功，用户名: ${res.data.name}`);
         this.setCookieVerified(true);
 
         let avatarUrl = res.data.face;
@@ -326,7 +325,7 @@ export class HttpClient {
       return null;
     }
 
-    logInfo(`[${this.selfId}] 正在获取用户 ${talker_id} 在时间戳 ${begin_seqno} 之后的消息`);
+    logInfo(`正在获取用户 ${talker_id} 在时间戳 ${begin_seqno} 之后的消息`);
     return this.safeRequest(async () => {
       const httpResponse = await this.http.get<BiliApiResponse<SessionMessagesData>>(
         'https://api.vc.bilibili.com/svr_sync/v1/svr_sync/fetch_session_msgs',
@@ -357,7 +356,7 @@ export class HttpClient {
       }
 
       if (res.code === 0) return res.data;
-      logInfo(`[${this.selfId}] 获取用户 ${talker_id} 的消息失败: ${res.message} (错误码: ${res.code})`);
+      logInfo(`获取用户 ${talker_id} 的消息失败: ${res.message} (错误码: ${res.code})`);
       return null;
     }, `[${this.selfId}] 获取用户 ${talker_id} 的消息时发生网络错误`, null);
   }
@@ -405,7 +404,7 @@ export class HttpClient {
   }
 
   async sendMessage(senderUid: string, receiverId: number, msgContent: string, msgType: 1 | 2 | 5): Promise<string | null> {
-    // logInfo(`[${this.selfId}] sendMessage: msgType=${msgType}, msgContent=${msgContent}`);
+    // logInfo(`sendMessage: msgType=${msgType}, msgContent=${msgContent}`);
     const msgObject = {
       sender_uid: senderUid,
       receiver_id: receiverId,
@@ -433,7 +432,7 @@ export class HttpClient {
       'csrf_token': this.biliJct,
       'csrf': this.biliJct,
     }).toString();
-    // logInfo(`[${this.selfId}] sendMessage: formPayload=${formPayload}`);
+    // logInfo(`sendMessage: formPayload=${formPayload}`);
 
     return this.safeRequest(async () => {
       const urlParams = await this.signWithWbi({
@@ -461,7 +460,7 @@ export class HttpClient {
       );
 
       const resText = httpResponse as unknown as string; // 强制转为 string
-      logInfo(`[${this.selfId}] sendMessage raw response text: ${resText}`);
+      logInfo(`sendMessage raw response text: ${resText}`);
 
       let res: BiliApiResponse<BiliSendMessageResponseData>;
       try {

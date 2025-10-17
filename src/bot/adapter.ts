@@ -16,7 +16,7 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot> {
 
     this.service = ctx.bilibili_dm_service
 
-    logInfo(`[${this.config.selfId}] 适配器初始化，selfId: ${this.config.selfId}`)
+    logInfo(`适配器初始化，selfId: ${this.config.selfId}`)
     ctx.server.get('/bilibili-dm/status', async (ctx) => {
       const status = this.service.getStatus()
 
@@ -57,12 +57,12 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot> {
     const actualConfig = config || this.config
     const selfId = actualConfig.selfId || this.config.selfId
 
-    logInfo(`[${selfId}] 开始fork过程，当前机器人ID: ${selfId}`)
+    logInfo(`开始fork过程，当前机器人ID: ${selfId}`)
 
     const sessionFile = path.join(this.ctx.baseDir, 'data', 'adapter-bilibili-dm', `${selfId}.cookie.json`)
     const hasCacheFile = await fs.access(sessionFile).then(() => true).catch(() => false)
 
-    logInfo(`[${selfId}] 开始fork过程，缓存文件存在: ${hasCacheFile}`)
+    logInfo(`开始fork过程，缓存文件存在: ${hasCacheFile}`)
 
     if (!hasCacheFile) {
       this.service.updateStatus(selfId, {
@@ -78,7 +78,7 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot> {
       })
     }
 
-    logInfo(`[${selfId}] 直接启动机器人...`)
+    logInfo(`直接启动机器人...`)
     await this.startBot(actualConfig)
 
     return this
@@ -113,7 +113,7 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot> {
   async startBot(pluginConfig: PluginConfig) {
     const bot = new BilibiliDmBot(this.ctx, pluginConfig)
 
-    logInfo(`[${pluginConfig.selfId}] 正在启动机器人...`)
+    logInfo(`正在启动机器人...`)
 
     const sessionFile = path.join(this.ctx.baseDir, 'data', 'adapter-bilibili-dm', `${pluginConfig.selfId}.cookie.json`)
     await fs.mkdir(path.dirname(sessionFile), { recursive: true })
@@ -123,16 +123,16 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot> {
     if (hasCacheFile) {
       try {
         const cookieData = JSON.parse(await fs.readFile(sessionFile, 'utf8'))
-        logInfo(`[${pluginConfig.selfId}] 从缓存文件加载cookie，数据长度: ${JSON.stringify(cookieData).length}`)
+        logInfo(`从缓存文件加载cookie，数据长度: ${JSON.stringify(cookieData).length}`)
         bot.http.setCookies(cookieData)
 
         const userInfo = await bot.http.getMyInfo()
         if (userInfo.isValid) {
-          logInfo(`[${pluginConfig.selfId}] 缓存cookie有效，用户名: ${userInfo.nickname}`)
+          logInfo(`缓存cookie有效，用户名: ${userInfo.nickname}`)
           bot.http.setCookieVerified(true)
-          logInfo(`[${pluginConfig.selfId}] 已设置cookie验证标志为true`)
+          logInfo(`已设置cookie验证标志为true`)
         } else {
-          logInfo(`[${pluginConfig.selfId}] 缓存cookie无效，需要重新登录`)
+          logInfo(`缓存cookie无效，需要重新登录`)
           bot.http.setCookieVerified(false)
         }
       } catch (error) {
@@ -144,10 +144,10 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot> {
       const loginSuccess = await this.service.startLogin(bot, sessionFile)
 
       if (loginSuccess) {
-        logInfo(`[${pluginConfig.selfId}] 登录成功，添加到机器人列表`)
+        logInfo(`登录成功，添加到机器人列表`)
         this.bots.push(bot)
       } else {
-        logInfo(`[${pluginConfig.selfId}] 登录失败`)
+        logInfo(`登录失败`)
         this.service.updateStatus(pluginConfig.selfId, {
           status: 'error',
           message: '登录失败，请重试'

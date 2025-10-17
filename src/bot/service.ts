@@ -40,7 +40,7 @@ export class BilibiliService {
             return
         }
 
-        logInfo(`[${selfId}] 更新状态前: ${JSON.stringify(this.status[selfId]?.status)}, 更新为: ${JSON.stringify(status.status)}`)
+        logInfo(`更新状态前: ${JSON.stringify(this.status[selfId]?.status)}, 更新为: ${JSON.stringify(status.status)}`)
 
         this.status[selfId] = {
             ...(this.status[selfId] || { status: 'init', selfId }),
@@ -50,7 +50,7 @@ export class BilibiliService {
 
         try {
             const eventName = `bilibili-dm-${selfId}/status-update`;
-            logInfo(`[${selfId}] 触发状态更新事件: ${eventName}, 状态: ${this.status[selfId].status}`)
+            logInfo(`触发状态更新事件: ${eventName}, 状态: ${this.status[selfId].status}`)
             this.ctx.emit(eventName as keyof import('koishi').Events, this.status[selfId])
 
             this.ctx.emit('bilibili-dm/status-update' as keyof import('koishi').Events, this.status[selfId])
@@ -59,12 +59,12 @@ export class BilibiliService {
                 this.ctx.setTimeout(() => {
                     if (!this.isDisposed) {
                         this.ctx.emit(eventName as keyof import('koishi').Events, this.status[selfId])
-                        logInfo(`[${selfId}] 手动再次触发状态更新事件，确保前端收到最新状态: ${this.status[selfId].status}`)
+                        logInfo(`手动再次触发状态更新事件，确保前端收到最新状态: ${this.status[selfId].status}`)
                     }
                 }, 100)
             } catch (err) {
                 if (err.code === 'INACTIVE_EFFECT') {
-                    logInfo(`[${selfId}] 上下文已不活跃，跳过状态更新事件触发`)
+                    logInfo(`上下文已不活跃，跳过状态更新事件触发`)
                     this.isDisposed = true
                 } else {
                     throw err
@@ -80,7 +80,7 @@ export class BilibiliService {
 
         try {
             if (!this.status[selfId]) {
-                logInfo(`[${selfId}] 创建新的状态对象，因为当前状态中不存在此selfId`)
+                logInfo(`创建新的状态对象，因为当前状态中不存在此selfId`)
                 this.status[selfId] = {
                     status: 'init',
                     selfId: selfId,
@@ -88,7 +88,7 @@ export class BilibiliService {
                 }
             }
 
-            logInfo(`[${selfId}] 开始startLogin过程，尝试登录...`)
+            logInfo(`开始startLogin过程，尝试登录...`)
             this.updateStatus(selfId, {
                 status: 'init',
                 selfId: selfId,
@@ -100,30 +100,30 @@ export class BilibiliService {
                     if (!this.isDisposed) {
                         const eventName = `bilibili-dm-${selfId}/status-update`;
                         this.ctx.emit(eventName as keyof import('koishi').Events, this.status[selfId])
-                        logInfo(`[${selfId}] 手动触发状态更新事件，确保前端收到初始化状态`)
+                        logInfo(`手动触发状态更新事件，确保前端收到初始化状态`)
                     }
                 }, 100)
             } catch (err) {
                 if (err.code === 'INACTIVE_EFFECT') {
-                    logInfo(`[${selfId}] 上下文已不活跃，跳过状态更新事件触发`)
+                    logInfo(`上下文已不活跃，跳过状态更新事件触发`)
                     this.isDisposed = true
                 } else {
-                    logInfo(`[${selfId}] 触发状态更新事件时出错: ${err.message}`)
+                    logInfo(`触发状态更新事件时出错: ${err.message}`)
                 }
             }
 
             const fileExists = existsSync(sessionFile)
-            logInfo(`[${selfId}] 检查缓存文件: ${sessionFile}，存在: ${fileExists}`)
+            logInfo(`检查缓存文件: ${sessionFile}，存在: ${fileExists}`)
             if (fileExists) {
-                logInfo(`[${selfId}] 发现缓存文件: ${sessionFile}，尝试使用缓存登录`)
+                logInfo(`发现缓存文件: ${sessionFile}，尝试使用缓存登录`)
                 try {
                     const cookieData = JSON.parse(await readFile(sessionFile, 'utf8'))
-                    logInfo(`[${selfId}] 成功读取缓存数据，设置cookies，数据长度: ${JSON.stringify(cookieData).length}`)
+                    logInfo(`成功读取缓存数据，设置cookies，数据长度: ${JSON.stringify(cookieData).length}`)
                     bot.http.setCookies(cookieData)
 
-                    logInfo(`[${selfId}] 验证cookie有效性...`)
+                    logInfo(`验证cookie有效性...`)
                     const userInfo = await bot.http.getMyInfo()
-                    logInfo(`[${selfId}] Cookie验证结果: ${userInfo.isValid ? '有效' : '无效'}，用户名: ${userInfo.nickname}`)
+                    logInfo(`Cookie验证结果: ${userInfo.isValid ? '有效' : '无效'}，用户名: ${userInfo.nickname}`)
                     if (userInfo.isValid) {
                         this.updateStatus(selfId, {
                             status: 'success',
@@ -137,10 +137,10 @@ export class BilibiliService {
 
                         loggerInfo(`[${selfId}] 已使用缓存登录，欢迎回来，${userInfo.nickname} ！`)
 
-                        logInfo(`[${selfId}] 登录成功，设置cookie并启动机器人`)
+                        logInfo(`登录成功，设置cookie并启动机器人`)
 
                         bot.http.setCookieVerified(true)
-                        logInfo(`[${selfId}] 已设置cookie验证标志为true`)
+                        logInfo(`已设置cookie验证标志为true`)
 
                         await new Promise(resolve => setTimeout(resolve, 1000))
 
@@ -163,8 +163,8 @@ export class BilibiliService {
                     })
                 }
             } else {
-                logInfo(`[${selfId}] 未找到缓存文件: ${sessionFile}，需要扫码登录`)
-                logInfo(`[${selfId}] 未找到缓存文件，将进入扫码登录流程`)
+                logInfo(`未找到缓存文件: ${sessionFile}，需要扫码登录`)
+                logInfo(`未找到缓存文件，将进入扫码登录流程`)
 
                 this.updateStatus(selfId, {
                     status: 'offline',
@@ -177,12 +177,12 @@ export class BilibiliService {
                         if (!this.isDisposed) {
                             const eventName = `bilibili-dm-${selfId}/status-update`;
                             this.ctx.emit(eventName as keyof import('koishi').Events, this.status[selfId])
-                            logInfo(`[${selfId}] 手动触发状态更新事件，通知前端需要扫码登录`)
+                            logInfo(`手动触发状态更新事件，通知前端需要扫码登录`)
                         }
                     }, 100)
                 } catch (err) {
                     if (err.code === 'INACTIVE_EFFECT') {
-                        logInfo(`[${selfId}] 上下文已不活跃，跳过状态更新事件触发`)
+                        logInfo(`上下文已不活跃，跳过状态更新事件触发`)
                         this.isDisposed = true
                     } else {
                         loggerError(`[${selfId}] 触发状态更新事件时出错: `, err)
@@ -193,14 +193,14 @@ export class BilibiliService {
             const qrData = await bot.http.getQrCodeData()
             if (!qrData) {
                 if (this.isDisposed || bot.http.isDisposed) {
-                    logInfo(`[${selfId}] 上下文已停用，无法获取二维码数据`)
+                    logInfo(`上下文已停用，无法获取二维码数据`)
                     this.updateStatus(selfId, {
                         status: 'error',
                         message: '插件已停用，无法获取二维码'
                     })
                     return false
                 } else {
-                    logInfo(`[${selfId}] 获取二维码失败，但不是因为上下文停用`)
+                    logInfo(`获取二维码失败，但不是因为上下文停用`)
                     this.updateStatus(selfId, {
                         status: 'error',
                         message: '获取二维码失败，请稍后重试'
@@ -216,8 +216,8 @@ export class BilibiliService {
                     errorCorrectionLevel: 'H'
                 })
 
-                logInfo(`[${selfId}] 生成二维码成功，URL: ${qrData.url}`)
-                logInfo(`[${selfId}] 二维码图片数据长度: ${qrImageBase64.length} 字节`)
+                logInfo(`生成二维码成功，URL: ${qrData.url}`)
+                logInfo(`二维码图片数据长度: ${qrImageBase64.length} 字节`)
 
                 if (!qrImageBase64.startsWith('data:image/')) {
                     throw new Error('生成的二维码数据格式不正确')
@@ -229,9 +229,9 @@ export class BilibiliService {
                     image: qrImageBase64
                 })
 
-                logInfo(`[${selfId}] 已更新状态为等待扫码，二维码已准备好在WebUI中显示`)
+                logInfo(`已更新状态为等待扫码，二维码已准备好在WebUI中显示`)
 
-                logInfo(`[${selfId}] 请在WebUI中查看登录二维码`)
+                logInfo(`请在WebUI中查看登录二维码`)
 
                 try {
                     this.ctx.setTimeout(() => {
@@ -239,12 +239,12 @@ export class BilibiliService {
                             const eventName = `bilibili-dm-${selfId}/status-update`;
                             this.ctx.emit(eventName as keyof import('koishi').Events, this.status[selfId])
                             this.ctx.emit('bilibili-dm/status-update' as keyof import('koishi').Events, this.status[selfId])
-                            logInfo(`[${selfId}] 手动触发状态更新事件，确保前端收到二维码`)
+                            logInfo(`手动触发状态更新事件，确保前端收到二维码`)
                         }
                     }, 500)
                 } catch (err) {
                     if (err.code === 'INACTIVE_EFFECT') {
-                        logInfo(`[${selfId}] 上下文已不活跃，跳过状态更新事件触发`)
+                        logInfo(`上下文已不活跃，跳过状态更新事件触发`)
                         this.isDisposed = true
                     } else {
                         loggerError(`[${selfId}] 触发状态更新事件时出错: `, err)
@@ -266,14 +266,14 @@ export class BilibiliService {
                 const pollResult = await bot.http.pollQrCodeStatus(qrData.qrcode_key)
 
                 if (pollResult.status === 'success' && pollResult.cookies) {
-                    logInfo(`[${selfId}] 二维码登录成功，设置cookie`)
+                    logInfo(`二维码登录成功，设置cookie`)
                     bot.http.setCookies(pollResult.cookies)
                     await writeFile(sessionFile, JSON.stringify(pollResult.cookies), 'utf8')
 
                     bot.http.setCookieVerified(true)
-                    logInfo(`[${selfId}] 已设置cookie验证标志为true`)
+                    logInfo(`已设置cookie验证标志为true`)
 
-                    logInfo(`[${selfId}] cookie已保存到文件: ${sessionFile}`)
+                    logInfo(`cookie已保存到文件: ${sessionFile}`)
 
                     const userInfo = await bot.http.getMyInfo()
 
@@ -298,12 +298,12 @@ export class BilibiliService {
                             if (!this.isDisposed) {
                                 const eventName = `bilibili-dm-${selfId}/status-update`;
                                 this.ctx.emit(eventName as keyof import('koishi').Events, this.status[selfId])
-                                logInfo(`[${selfId}] 手动触发状态更新事件，确保前端收到登录成功状态`)
+                                logInfo(`手动触发状态更新事件，确保前端收到登录成功状态`)
                             }
                         }, 500)
                     } catch (err) {
                         if (err.code === 'INACTIVE_EFFECT') {
-                            logInfo(`[${selfId}] 上下文已不活跃，跳过状态更新事件触发`)
+                            logInfo(`上下文已不活跃，跳过状态更新事件触发`)
                             this.isDisposed = true
                         } else {
                             loggerError(`[${selfId}] 触发状态更新事件时出错: `, err)
