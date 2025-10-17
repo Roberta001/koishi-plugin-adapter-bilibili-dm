@@ -20,7 +20,8 @@ import {
     SearchArticle,
     ComprehensiveSearchResponse,
     SearchOptions,
-    VideoData
+    VideoData,
+    ExternalParseResponse
 } from './apis/types'
 
 export class Internal implements InternalInterface {
@@ -380,6 +381,17 @@ export class Internal implements InternalInterface {
      */
     async getVideoInfo(bvid: string): Promise<VideoData | null> {
         return this.videoAPI.getVideoInfo(bvid)
+    }
+
+    /**
+     * 通用解析函数，支持视频/番剧/直播/动态/专栏的链接解析
+     * 调用星之阁API获取直链信息
+     * @param url 需要解析的B站链接
+     * @param accessKey 大会员密钥（可选）
+     * @returns Promise<ExternalParseResponse | null> 解析结果
+     */
+    async parseExternalUrl(url: string, accessKey?: string): Promise<ExternalParseResponse | null> {
+        return this.videoAPI.parseExternalUrl(url, accessKey)
     }
 
     // #endregion

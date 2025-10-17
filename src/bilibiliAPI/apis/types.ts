@@ -115,7 +115,6 @@ export interface DynamicDesc {
     rich_text_nodes: RichTextNode[]
     text: string
 }
-
 export interface DynamicMajor {
     type: string
     ugc_season?: {
@@ -795,7 +794,7 @@ export interface SearchOptions {
     categoryId?: number
 }
 
-// 动态摘要信息（用于监听）
+// 动态摘要信息
 export interface DynamicSummary {
     id: string
     authorUid: number
@@ -827,7 +826,7 @@ export interface LivePortalResponse {
     up_list: any
 }
 
-// 直播摘要信息（用于监听）
+// 直播摘要信息
 export interface LiveSummary {
     mid: number
     uname: string
@@ -852,54 +851,6 @@ export interface LiveEventData {
     }
     timestamp: number
     rawData: any
-}
-
-// Internal API 接口定义
-export interface InternalInterface {
-    // 用户关注相关
-    followUser(uid: string): Promise<boolean>
-    unfollowUser(uid: string): Promise<boolean>
-    getFollowedUsers(maxPages?: number): Promise<FollowingUser[]>
-    getUserInfo(uid: string): Promise<any>
-    isFollowing(uid: string): Promise<boolean>
-    batchCheckFollowing(uids: string[]): Promise<Record<string, boolean>>
-    getTokenByUid(uid: string): Promise<any | null>
-
-    // 动态相关
-    getAllFollowedDynamics(offset?: string, updateBaseline?: string): Promise<DynamicItem[]>
-    getPersonalDynamics(uid: string, offset?: string): Promise<DynamicItem[]>
-    getDynamicDetail(dynamicId: string): Promise<DynamicItem | null>
-
-    // 动态监听
-    startDynamicPolling(interval?: number): void
-    stopDynamicPolling(): void
-    isPollingActive(): boolean
-    setPollInterval(interval: number): void
-    getCurrentBaseline(): string
-    setBaseline(baseline: string): void
-
-    // 搜索相关
-    comprehensiveSearch(keyword: string): Promise<ComprehensiveSearchResponse | null>
-    searchUsers(keyword: string, options?: SearchOptions): Promise<SearchUser[]>
-    searchVideos(keyword: string, options?: SearchOptions): Promise<SearchVideo[]>
-    searchLive(keyword: string, options?: SearchOptions): Promise<{ liveRooms: SearchLiveRoom[], liveUsers: SearchLiveUser[] }>
-    searchArticles(keyword: string, options?: SearchOptions): Promise<SearchArticle[]>
-    searchUsersByName(username: string, exactMatch?: boolean): Promise<SearchUser[]>
-    searchUpUsers(keyword: string, options?: SearchOptions): Promise<SearchUser[]>
-
-    // 直播相关
-    getLiveUsers(): Promise<LiveUser[] | null>
-    startLivePolling(interval?: number): void
-    stopLivePolling(): void
-    isLivePollingActive(): boolean
-    setLivePollInterval(interval: number): void
-    getCurrentLiveUsersSummary(): LiveSummary[]
-    manualLiveCheck(): Promise<void>
-    getUserLiveStatus(mid: number): Promise<LiveUser | null>
-    isUserLive(mid: number): Promise<boolean | null>
-
-    // 视频信息相关
-    getVideoInfo(bvid: string): Promise<VideoData | null>
 }
 
 // 直播间相关类型定义
@@ -1191,4 +1142,148 @@ export interface VideoInfoResponse {
     message: string
     ttl: number
     data: VideoData
+}
+
+export interface ExternalParseResponse {
+    code: number
+    message?: string
+    msg?: string
+    data?: {
+        // 视频相关字段
+        bvid?: string
+        aid?: number
+        cid?: number
+        title?: string
+        desc?: string
+        pic?: string
+        video_url?: string
+        audio_url?: string
+        duration?: number
+        format?: string
+        quality?: number
+        accept_quality?: number[]
+        accept_description?: string[]
+
+        // 视频详细信息
+        video?: {
+            title?: string
+            fm?: string // 封面图
+            lx?: string // 类型
+            desc?: string
+            max_qxd?: string // 最高清晰度
+            url?: string // 视频直链
+        }
+
+        // UP主信息
+        owner?: {
+            name?: string
+            mid?: number
+            face?: string
+        }
+
+        // 统计数据
+        stat?: {
+            view?: number
+            reply?: number
+            favorite?: number
+            like?: number
+            coin?: number
+            share?: number
+            danmuku?: number
+            ctime?: number
+            time?: string
+        }
+
+        // 内容类型
+        type?: string
+
+        // 番剧相关
+        message?: string
+        ep_id?: number
+
+        // 直播相关
+        live?: {
+            title?: string
+            cover?: string
+            keyframe?: string
+            room_url?: string
+            room_id?: number
+            short_id?: number
+            status?: number
+            attention?: number
+            online?: number
+            desc?: string
+            time?: string
+            url?: string[]
+        }
+
+        // 专栏相关
+        user?: {
+            mid?: number | null
+            name?: string | null
+            face?: string | null
+        }
+        stast?: any
+        categories?: any
+        tag?: any
+        time?: {
+            review_time?: string
+            publish_time?: string
+        }
+        essay?: string
+
+        // 其他可能的字段
+        [key: string]: any
+    }
+    // 其他可能的字段
+    [key: string]: any
+}
+
+// Internal API 接口定义
+export interface InternalInterface {
+    // 用户关注相关
+    followUser(uid: string): Promise<boolean>
+    unfollowUser(uid: string): Promise<boolean>
+    getFollowedUsers(maxPages?: number): Promise<FollowingUser[]>
+    getUserInfo(uid: string): Promise<any>
+    isFollowing(uid: string): Promise<boolean>
+    batchCheckFollowing(uids: string[]): Promise<Record<string, boolean>>
+    getTokenByUid(uid: string): Promise<any | null>
+
+    // 动态相关
+    getAllFollowedDynamics(offset?: string, updateBaseline?: string): Promise<DynamicItem[]>
+    getPersonalDynamics(uid: string, offset?: string): Promise<DynamicItem[]>
+    getDynamicDetail(dynamicId: string): Promise<DynamicItem | null>
+
+    // 动态监听
+    startDynamicPolling(interval?: number): void
+    stopDynamicPolling(): void
+    isPollingActive(): boolean
+    setPollInterval(interval: number): void
+    getCurrentBaseline(): string
+    setBaseline(baseline: string): void
+
+    // 搜索相关
+    comprehensiveSearch(keyword: string): Promise<ComprehensiveSearchResponse | null>
+    searchUsers(keyword: string, options?: SearchOptions): Promise<SearchUser[]>
+    searchVideos(keyword: string, options?: SearchOptions): Promise<SearchVideo[]>
+    searchLive(keyword: string, options?: SearchOptions): Promise<{ liveRooms: SearchLiveRoom[], liveUsers: SearchLiveUser[] }>
+    searchArticles(keyword: string, options?: SearchOptions): Promise<SearchArticle[]>
+    searchUsersByName(username: string, exactMatch?: boolean): Promise<SearchUser[]>
+    searchUpUsers(keyword: string, options?: SearchOptions): Promise<SearchUser[]>
+
+    // 直播相关
+    getLiveUsers(): Promise<LiveUser[] | null>
+    startLivePolling(interval?: number): void
+    stopLivePolling(): void
+    isLivePollingActive(): boolean
+    setLivePollInterval(interval: number): void
+    getCurrentLiveUsersSummary(): LiveSummary[]
+    manualLiveCheck(): Promise<void>
+    getUserLiveStatus(mid: number): Promise<LiveUser | null>
+    isUserLive(mid: number): Promise<boolean | null>
+
+    // 视频信息相关
+    getVideoInfo(bvid: string): Promise<VideoData | null>
+    parseExternalUrl(url: string, accessKey?: string): Promise<ExternalParseResponse | null>
 }
