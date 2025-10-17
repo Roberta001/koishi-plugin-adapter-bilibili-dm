@@ -378,8 +378,8 @@ export class Internal implements InternalInterface {
      * @param bvid 视频BV号
      * @returns Promise<VideoData | null> 视频详细信息
      */
-    async parseVideo(bvid: string): Promise<VideoData | null> {
-        return this.videoAPI.parseVideo(bvid)
+    async getVideoInfo(bvid: string): Promise<VideoData | null> {
+        return this.videoAPI.getVideoInfo(bvid)
     }
 
     // #endregion

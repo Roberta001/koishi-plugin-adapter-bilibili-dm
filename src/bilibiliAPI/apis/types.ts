@@ -899,7 +899,7 @@ export interface InternalInterface {
     isUserLive(mid: number): Promise<boolean | null>
 
     // 视频信息相关
-    parseVideo(bvid: string): Promise<VideoData | null>
+    getVideoInfo(bvid: string): Promise<VideoData | null>
 }
 
 // 直播间相关类型定义

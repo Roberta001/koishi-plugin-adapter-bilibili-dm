@@ -19,7 +19,7 @@ export class VideoAPI {
      * @param bvid 视频BV号
      * @returns Promise<VideoData | null> 视频详细信息
      */
-    async parseVideo(bvid: string): Promise<VideoData | null> {
+    async getVideoInfo(bvid: string): Promise<VideoData | null> {
         try {
             // 验证BV号格式
             if (!bvid.startsWith('BV') || bvid.length < 10) {
