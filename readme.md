@@ -51,3 +51,7 @@ yarn dev
 ## 许可证
 
 [MIT License](LICENSE)
+
+## 项目鸣谢
+
+- https://github.com/SocialSisterYi/bilibili-API-collect
