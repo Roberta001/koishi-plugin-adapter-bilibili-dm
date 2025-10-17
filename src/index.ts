@@ -37,6 +37,10 @@ export const usage = `
 <p>➣ <a href="https://roberta001.github.io/koishi-plugin-adapter-bilibili-dm/" target="_blank">点我查看使用说明</a></p>
 
 ---
+
+如果不希望bot响应消息，请配置 nestedblocked 配置项。
+
+---
 `
 
 export * from './test/test'
