@@ -1,21 +1,24 @@
 // src\bilibiliAPI\apis\user.ts
-import { BilibiliDmBot } from '../../bot/bot'
-import { logInfo, loggerError } from '../../index'
-import {
+import { BilibiliDmBot } from '../../bot/bot';
+import { logInfo, loggerError } from '../../index';
+import
+{
     FollowingUser,
     FollowingListResponse,
     BilibiliResponse,
     BilibiliError
-} from './types'
+} from './types';
 
-import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
-export class UserAPI {
-    private bot: BilibiliDmBot
+export class UserAPI
+{
+    private bot: BilibiliDmBot;
 
-    constructor(bot: BilibiliDmBot) {
-        this.bot = bot
+    constructor(bot: BilibiliDmBot)
+    {
+        this.bot = bot;
     }
 
     /**
@@ -23,8 +26,10 @@ export class UserAPI {
      * @param uid UP 主的 UID
      * @returns Promise<boolean> 是否成功关注
      */
-    async followUser(uid: string): Promise<boolean> {
-        try {
+    async followUser(uid: string): Promise<boolean>
+    {
+        try
+        {
             const res: BilibiliResponse = await this.bot.http.http.post(
                 'https://api.bilibili.com/x/relation/modify',
                 new URLSearchParams({
@@ -41,23 +46,27 @@ export class UserAPI {
                         'Referer': `https://space.bilibili.com/${uid}/`
                     }
                 }
-            )
+            );
 
-            if (res.code === 0) {
-                logInfo(`成功关注 UP 主: ${uid}`)
-                return true
-            } else {
-                loggerError(`关注 UP 主 ${uid} 失败: ${res.message} (Code: ${res.code})`)
+            if (res.code === 0)
+            {
+                logInfo(`成功关注 UP 主: ${uid}`);
+                return true;
+            } else
+            {
+                loggerError(`关注 UP 主 ${uid} 失败: ${res.message} (Code: ${res.code})`);
                 // 抛出包含错误码和消息的错误，以便上层处理
-                throw new BilibiliError(res.message, res.code)
+                throw new BilibiliError(res.message, res.code);
             }
-        } catch (error) {
+        } catch (error)
+        {
             // 如果是我们抛出的BilibiliError，直接重新抛出
-            if (error instanceof BilibiliError) {
-                throw error
+            if (error instanceof BilibiliError)
+            {
+                throw error;
             }
-            loggerError(`关注 UP 主 ${uid} 时发生错误: `, error)
-            throw error
+            loggerError(`关注 UP 主 ${uid} 时发生错误: `, error);
+            throw error;
         }
     }
 
@@ -66,8 +75,10 @@ export class UserAPI {
      * @param uid UP 主的 UID
      * @returns Promise<boolean> 是否成功取消关注
      */
-    async unfollowUser(uid: string): Promise<boolean> {
-        try {
+    async unfollowUser(uid: string): Promise<boolean>
+    {
+        try
+        {
             const res: BilibiliResponse = await this.bot.http.http.post(
                 'https://api.bilibili.com/x/relation/modify',
                 new URLSearchParams({
@@ -84,23 +95,27 @@ export class UserAPI {
                         'Referer': `https://space.bilibili.com/${uid}/`
                     }
                 }
-            )
+            );
 
-            if (res.code === 0) {
-                logInfo(`成功取消关注 UP 主: ${uid}`)
-                return true
-            } else {
-                loggerError(`取消关注 UP 主 ${uid} 失败: ${res.message} (Code: ${res.code})`)
+            if (res.code === 0)
+            {
+                logInfo(`成功取消关注 UP 主: ${uid}`);
+                return true;
+            } else
+            {
+                loggerError(`取消关注 UP 主 ${uid} 失败: ${res.message} (Code: ${res.code})`);
                 // 抛出包含错误码和消息的错误，以便上层处理
-                throw new BilibiliError(res.message, res.code)
+                throw new BilibiliError(res.message, res.code);
             }
-        } catch (error) {
+        } catch (error)
+        {
             // 如果是我们抛出的BilibiliError，直接重新抛出
-            if (error instanceof BilibiliError) {
-                throw error
+            if (error instanceof BilibiliError)
+            {
+                throw error;
             }
-            loggerError(`取消关注 UP 主 ${uid} 时发生错误: `, error)
-            throw error
+            loggerError(`取消关注 UP 主 ${uid} 时发生错误: `, error);
+            throw error;
         }
     }
 
@@ -109,13 +124,16 @@ export class UserAPI {
      * @param maxPages 最大页数，默认10页
      * @returns Promise<FollowingUser[]> 关注的用户列表
      */
-    async getFollowedUsers(maxPages: number = 10): Promise<FollowingUser[]> {
-        try {
-            let page = 1
-            let hasMore = true
-            const allFollowings: FollowingUser[] = []
+    async getFollowedUsers(maxPages: number = 10): Promise<FollowingUser[]>
+    {
+        try
+        {
+            let page = 1;
+            let hasMore = true;
+            const allFollowings: FollowingUser[] = [];
 
-            while (hasMore && page <= maxPages) {
+            while (hasMore && page <= maxPages)
+            {
                 const res: BilibiliResponse<FollowingListResponse> = await this.bot.http.http.get(
                     'https://api.bilibili.com/x/relation/followings',
                     {
@@ -131,28 +149,32 @@ export class UserAPI {
                             'Referer': `https://space.bilibili.com/${this.bot.selfId}/fans/follow`
                         }
                     }
-                )
+                );
 
-                if (res.code === 0 && res.data?.list) {
-                    allFollowings.push(...res.data.list)
-                    hasMore = res.data.has_more
-                    page++
+                if (res.code === 0 && res.data?.list)
+                {
+                    allFollowings.push(...res.data.list);
+                    hasMore = res.data.has_more;
+                    page++;
 
                     // 添加延迟避免请求过快
-                    if (hasMore && page <= maxPages) {
-                        await new Promise(resolve => setTimeout(resolve, 1000))
+                    if (hasMore && page <= maxPages)
+                    {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
                     }
-                } else {
-                    loggerError(`获取关注列表失败: ${res.message} (Code: ${res.code})`)
-                    hasMore = false
+                } else
+                {
+                    loggerError(`获取关注列表失败: ${res.message} (Code: ${res.code})`);
+                    hasMore = false;
                 }
             }
 
-            logInfo(`成功获取 ${allFollowings.length} 个关注的用户`)
-            return allFollowings
-        } catch (error) {
-            loggerError('获取关注的用户列表时发生错误: ', error)
-            return []
+            logInfo(`成功获取 ${allFollowings.length} 个关注的用户`);
+            return allFollowings;
+        } catch (error)
+        {
+            loggerError('获取关注的用户列表时发生错误: ', error);
+            return [];
         }
     }
 
@@ -161,8 +183,10 @@ export class UserAPI {
      * @param uid 用户UID
      * @returns Promise<any> 用户信息
      */
-    async getUserInfo(uid: string): Promise<any> {
-        try {
+    async getUserInfo(uid: string): Promise<any>
+    {
+        try
+        {
             const res: BilibiliResponse = await this.bot.http.http.get(
                 'https://api.bilibili.com/x/space/acc/info',
                 {
@@ -174,22 +198,26 @@ export class UserAPI {
                         'Referer': `https://space.bilibili.com/${uid}/`
                     }
                 }
-            )
+            );
 
-            if (res.code === 0 && res.data) {
-                logInfo(`成功获取用户 ${uid} 的信息`)
-                return res.data
-            } else {
-                loggerError(`获取用户 ${uid} 信息失败: ${res.message} (Code: ${res.code})`)
-                throw new BilibiliError(res.message, res.code)
+            if (res.code === 0 && res.data)
+            {
+                logInfo(`成功获取用户 ${uid} 的信息`);
+                return res.data;
+            } else
+            {
+                loggerError(`获取用户 ${uid} 信息失败: ${res.message} (Code: ${res.code})`);
+                throw new BilibiliError(res.message, res.code);
             }
-        } catch (error) {
+        } catch (error)
+        {
             // 如果是我们抛出的BilibiliError，直接重新抛出
-            if (error instanceof BilibiliError) {
-                throw error
+            if (error instanceof BilibiliError)
+            {
+                throw error;
             }
-            loggerError(`获取用户 ${uid} 信息时发生错误: `, error)
-            throw error
+            loggerError(`获取用户 ${uid} 信息时发生错误: `, error);
+            throw error;
         }
     }
 
@@ -198,8 +226,10 @@ export class UserAPI {
      * @param uid 用户UID
      * @returns Promise<boolean> 是否已关注
      */
-    async isFollowing(uid: string): Promise<boolean> {
-        try {
+    async isFollowing(uid: string): Promise<boolean>
+    {
+        try
+        {
             const res: BilibiliResponse = await this.bot.http.http.get(
                 'https://api.bilibili.com/x/relation',
                 {
@@ -211,22 +241,26 @@ export class UserAPI {
                         'Referer': `https://space.bilibili.com/${uid}/`
                     }
                 }
-            )
+            );
 
-            if (res.code === 0 && res.data) {
+            if (res.code === 0 && res.data)
+            {
                 // attribute 为 2 表示已关注
-                return res.data.attribute === 2
-            } else {
-                loggerError(`检查关注状态失败: ${res.message} (Code: ${res.code})`)
-                throw new BilibiliError(res.message, res.code)
+                return res.data.attribute === 2;
+            } else
+            {
+                loggerError(`检查关注状态失败: ${res.message} (Code: ${res.code})`);
+                throw new BilibiliError(res.message, res.code);
             }
-        } catch (error) {
+        } catch (error)
+        {
             // 如果是我们抛出的BilibiliError，直接重新抛出
-            if (error instanceof BilibiliError) {
-                throw error
+            if (error instanceof BilibiliError)
+            {
+                throw error;
             }
-            loggerError(`检查关注状态时发生错误: `, error)
-            throw error
+            loggerError(`检查关注状态时发生错误: `, error);
+            throw error;
         }
     }
 
@@ -235,29 +269,33 @@ export class UserAPI {
      * @param uids 用户UID列表
      * @returns Promise<Record<string, boolean>> UID到关注状态的映射
      */
-    async batchCheckFollowing(uids: string[]): Promise<Record<string, boolean>> {
-        const result: Record<string, boolean> = {}
+    async batchCheckFollowing(uids: string[]): Promise<Record<string, boolean>>
+    {
+        const result: Record<string, boolean> = {};
 
         // 分批处理，避免请求过多
-        const batchSize = 10
-        for (let i = 0; i < uids.length; i += batchSize) {
-            const batch = uids.slice(i, i + batchSize)
+        const batchSize = 10;
+        for (let i = 0; i < uids.length; i += batchSize)
+        {
+            const batch = uids.slice(i, i + batchSize);
 
-            const promises = batch.map(async (uid) => {
-                const isFollowing = await this.isFollowing(uid)
-                result[uid] = isFollowing
-                return { uid, isFollowing }
-            })
+            const promises = batch.map(async (uid) =>
+            {
+                const isFollowing = await this.isFollowing(uid);
+                result[uid] = isFollowing;
+                return { uid, isFollowing };
+            });
 
-            await Promise.all(promises)
+            await Promise.all(promises);
 
             // 添加延迟避免请求过快
-            if (i + batchSize < uids.length) {
-                await new Promise(resolve => setTimeout(resolve, 1000))
+            if (i + batchSize < uids.length)
+            {
+                await new Promise(resolve => setTimeout(resolve, 1000));
             }
         }
 
-        return result
+        return result;
     }
 
     /**
@@ -265,26 +303,30 @@ export class UserAPI {
      * @param uid 登录bot的UID
      * @returns Promise<any | null> 返回cookie数据，如果文件不存在则返回null
      */
-    async getTokenByUid(uid: string): Promise<any | null> {
-        try {
-            const baseDir = this.bot.ctx.baseDir
-            const cookieFile = resolve(baseDir, 'data', 'adapter-bilibili-dm', `${uid}.cookie.json`)
+    async getTokenByUid(uid: string): Promise<any | null>
+    {
+        try
+        {
+            const baseDir = this.bot.ctx.baseDir;
+            const cookieFile = resolve(baseDir, 'data', 'adapter-bilibili-dm', `${uid}.cookie.json`);
 
-            logInfo(`检查cookie文件: ${cookieFile}`)
+            logInfo(`检查cookie文件: ${cookieFile}`);
 
-            if (!existsSync(cookieFile)) {
-                logInfo(`UID ${uid} 的cookie文件不存在: ${cookieFile}`)
-                return null
+            if (!existsSync(cookieFile))
+            {
+                logInfo(`UID ${uid} 的cookie文件不存在: ${cookieFile}`);
+                return null;
             }
 
-            const cookieData = readFileSync(cookieFile, 'utf8')
-            const parsedData = JSON.parse(cookieData)
+            const cookieData = readFileSync(cookieFile, 'utf8');
+            const parsedData = JSON.parse(cookieData);
 
-            logInfo(`成功读取UID ${uid} 的cookie数据，数据长度: ${cookieData.length}`)
-            return parsedData
-        } catch (error) {
-            loggerError(`读取UID ${uid} 的cookie数据时发生错误: `, error)
-            return null
+            logInfo(`成功读取UID ${uid} 的cookie数据，数据长度: ${cookieData.length}`);
+            return parsedData;
+        } catch (error)
+        {
+            loggerError(`读取UID ${uid} 的cookie数据时发生错误: `, error);
+            return null;
         }
     }
 }

@@ -1,13 +1,14 @@
 // 工具函数集合
-import { logInfo } from '../index'
+import { logInfo } from '../index';
 
 /**
  * 验证UID是否为有效的数字
  * @param uid UID字符串
  * @returns 是否为有效的数字UID
  */
-export function isValidUid(uid: string): boolean {
-    return /^\d+$/.test(uid)
+export function isValidUid(uid: string): boolean
+{
+    return /^\d+$/.test(uid);
 }
 
 /**
@@ -15,8 +16,9 @@ export function isValidUid(uid: string): boolean {
  * @param blockedUids 屏蔽的UID列表
  * @returns 是否包含通配符
  */
-export function hasWildcardUid(blockedUids: Array<{ name: string; uid: string }>): boolean {
-    return blockedUids.some(item => item.uid.includes('*'))
+export function hasWildcardUid(blockedUids: Array<{ name: string; uid: string; }>): boolean
+{
+    return blockedUids.some(item => item.uid.includes('*'));
 }
 
 /**
@@ -24,8 +26,9 @@ export function hasWildcardUid(blockedUids: Array<{ name: string; uid: string }>
  * @param blockedUids 屏蔽的UID列表
  * @returns 是否忽略所有私信
  */
-export function shouldIgnoreAllPrivateMessages(blockedUids: Array<{ name: string; uid: string }>): boolean {
-    return hasWildcardUid(blockedUids)
+export function shouldIgnoreAllPrivateMessages(blockedUids: Array<{ name: string; uid: string; }>): boolean
+{
+    return hasWildcardUid(blockedUids);
 }
 
 /**
@@ -34,28 +37,33 @@ export function shouldIgnoreAllPrivateMessages(blockedUids: Array<{ name: string
  * @param blockedUids 屏蔽的UID列表
  * @returns 是否屏蔽该消息
  */
-export function shouldBlockMessage(senderUid: string, blockedUids: Array<{ name: string; uid: string }>): boolean {
+export function shouldBlockMessage(senderUid: string, blockedUids: Array<{ name: string; uid: string; }>): boolean
+{
     // 如果包含通配符，忽略所有私信
-    if (shouldIgnoreAllPrivateMessages(blockedUids)) {
-        logInfo(`检测到通配符配置，忽略所有私信消息`)
-        return true
+    if (shouldIgnoreAllPrivateMessages(blockedUids))
+    {
+        logInfo(`检测到通配符配置，忽略所有私信消息`);
+        return true;
     }
 
     // 检查是否在屏蔽列表中
-    const shouldBlock = blockedUids.some(blocked => {
+    const shouldBlock = blockedUids.some(blocked =>
+    {
         // 只验证有效的数字UID
-        if (!isValidUid(blocked.uid)) {
-            logInfo(`忽略无效的屏蔽UID配置: ${blocked.uid} (名称: ${blocked.name})`)
-            return false
+        if (!isValidUid(blocked.uid))
+        {
+            logInfo(`忽略无效的屏蔽UID配置: ${blocked.uid} (名称: ${blocked.name})`);
+            return false;
         }
-        return blocked.uid === senderUid
-    })
+        return blocked.uid === senderUid;
+    });
 
-    if (shouldBlock) {
-        logInfo(`屏蔽来自UID ${senderUid} 的消息`)
+    if (shouldBlock)
+    {
+        logInfo(`屏蔽来自UID ${senderUid} 的消息`);
     }
 
-    return shouldBlock
+    return shouldBlock;
 }
 
 /**
@@ -63,12 +71,15 @@ export function shouldBlockMessage(senderUid: string, blockedUids: Array<{ name:
  * @param blockedUids 原始屏蔽UID列表
  * @returns 过滤后的有效配置
  */
-export function filterValidBlockedUids(blockedUids: Array<{ name: string; uid: string }>): Array<{ name: string; uid: string }> {
-    return blockedUids.filter(item => {
-        const isValid = isValidUid(item.uid) || item.uid.includes('*')
-        if (!isValid) {
-            logInfo(`过滤无效的屏蔽配置: UID=${item.uid}, 名称=${item.name}`)
+export function filterValidBlockedUids(blockedUids: Array<{ name: string; uid: string; }>): Array<{ name: string; uid: string; }>
+{
+    return blockedUids.filter(item =>
+    {
+        const isValid = isValidUid(item.uid) || item.uid.includes('*');
+        if (!isValid)
+        {
+            logInfo(`过滤无效的屏蔽配置: UID=${item.uid}, 名称=${item.name}`);
         }
-        return isValid
-    })
+        return isValid;
+    });
 }

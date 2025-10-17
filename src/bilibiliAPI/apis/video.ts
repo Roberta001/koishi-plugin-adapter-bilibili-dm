@@ -1,18 +1,21 @@
 // src\bilibiliAPI\apis\video.ts
-import { BilibiliDmBot } from '../../bot/bot'
-import { logInfo, loggerError } from '../../index'
-import {
+import { BilibiliDmBot } from '../../bot/bot';
+import { logInfo, loggerError } from '../../index';
+import
+{
     VideoData,
     VideoInfoResponse,
     BilibiliError,
     ExternalParseResponse
-} from './types'
+} from './types';
 
-export class VideoAPI {
-    private bot: BilibiliDmBot
+export class VideoAPI
+{
+    private bot: BilibiliDmBot;
 
-    constructor(bot: BilibiliDmBot) {
-        this.bot = bot
+    constructor(bot: BilibiliDmBot)
+    {
+        this.bot = bot;
     }
 
     /**
@@ -20,17 +23,20 @@ export class VideoAPI {
      * @param bvid 视频BV号
      * @returns Promise<VideoData | null> 视频信息
      */
-    async getVideoInfo(bvid: string): Promise<VideoData | null> {
-        try {
+    async getVideoInfo(bvid: string): Promise<VideoData | null>
+    {
+        try
+        {
             // 验证BV号格式
-            if (!bvid.startsWith('BV') || bvid.length < 10) {
-                loggerError(`无效的BV号格式: ${bvid}`)
-                return null
+            if (!bvid.startsWith('BV') || bvid.length < 10)
+            {
+                loggerError(`无效的BV号格式: ${bvid}`);
+                return null;
             }
 
             // 构建请求参数
-            const baseParams = { bvid }
-            const signedParams = await this.bot.http.getWbiSignature(baseParams)
+            const baseParams = { bvid };
+            const signedParams = await this.bot.http.getWbiSignature(baseParams);
 
             // 调用B站API获取视频信息
             const response = await this.bot.http.http.get<VideoInfoResponse>(
@@ -42,18 +48,21 @@ export class VideoAPI {
                         'Origin': 'https://www.bilibili.com'
                     }
                 }
-            )
+            );
 
-            if (response.code === 0 && response.data) {
-                logInfo(`成功获取视频信息: ${bvid}, 标题: ${response.data.title}`)
-                return response.data
-            } else {
-                loggerError(`获取视频信息失败: ${bvid}, 错误码: ${response.code}, 消息: ${response.message}`)
-                return null
+            if (response.code === 0 && response.data)
+            {
+                logInfo(`成功获取视频信息: ${bvid}, 标题: ${response.data.title}`);
+                return response.data;
+            } else
+            {
+                loggerError(`获取视频信息失败: ${bvid}, 错误码: ${response.code}, 消息: ${response.message}`);
+                return null;
             }
-        } catch (error) {
-            loggerError(`解析视频信息时发生错误: ${bvid}`, error)
-            return null
+        } catch (error)
+        {
+            loggerError(`解析视频信息时发生错误: ${bvid}`, error);
+            return null;
         }
     }
 
@@ -64,17 +73,21 @@ export class VideoAPI {
      * @param accessKey 大会员密钥（可选）
      * @returns Promise<ExternalParseResponse | null> 解析结果
      */
-    async parseExternalUrl(url: string, accessKey?: string): Promise<ExternalParseResponse | null> {
-        try {
+    async parseExternalUrl(url: string, accessKey?: string): Promise<ExternalParseResponse | null>
+    {
+        try
+        {
             // 验证URL格式
-            if (!url || typeof url !== 'string') {
-                loggerError(`无效的URL: ${url}`)
-                return null
+            if (!url || typeof url !== 'string')
+            {
+                loggerError(`无效的URL: ${url}`);
+                return null;
             }
 
-            const params: Record<string, string> = { url }
-            if (accessKey) {
-                params.access_key = accessKey
+            const params: Record<string, string> = { url };
+            if (accessKey)
+            {
+                params.access_key = accessKey;
             }
 
             const response = await this.bot.http.http.get<ExternalParseResponse>(
@@ -83,18 +96,21 @@ export class VideoAPI {
                     params,
                     timeout: 30 * 1000
                 }
-            )
+            );
 
-            if (response.code === 0) {
-                logInfo(`成功使用外部API解析链接: ${url}`)
-                return response
-            } else {
-                loggerError(`解析链接失败: ${url}, 错误码: ${response.code}, 消息: ${response.message}`)
-                return response // 仍然返回响应，让调用者处理
+            if (response.code === 0)
+            {
+                logInfo(`成功使用外部API解析链接: ${url}`);
+                return response;
+            } else
+            {
+                loggerError(`解析链接失败: ${url}, 错误码: ${response.code}, 消息: ${response.message}`);
+                return response; // 仍然返回响应，让调用者处理
             }
-        } catch (error) {
-            loggerError(`解析链接时发生错误: ${url}`, error)
-            return null
+        } catch (error)
+        {
+            loggerError(`解析链接时发生错误: ${url}`, error);
+            return null;
         }
     }
 }

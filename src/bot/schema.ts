@@ -1,6 +1,6 @@
 //  src\schema.ts
-import { Schema } from 'koishi'
-import { PluginConfig } from './types'
+import { Schema } from 'koishi';
+import { PluginConfig } from './types';
 
 const defaultblockedUids = [
   {
@@ -59,7 +59,7 @@ const defaultblockedUids = [
     "uid": "625647470",
     "name": "必剪"
   }
-]
+];
 
 export const Config: Schema<PluginConfig> =
   Schema.intersect([
@@ -108,4 +108,4 @@ export const Config: Schema<PluginConfig> =
       loggerLiveInfo: Schema.boolean().default(false).description("直播间弹幕 日志调试模式<br>超级刷屏。禁止开发者以外的人开启。").experimental(),
     }).description('开发调试选项'),
 
-  ])
+  ]);

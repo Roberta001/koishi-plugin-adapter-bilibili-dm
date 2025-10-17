@@ -1,8 +1,9 @@
 // src\test\test.ts
-import { Context } from 'koishi'
+import { Context } from 'koishi';
 // import {  } from 'koishi-plugin-adapter-bilibili-dm'
 
-export function BilibiliTestPlugin(ctx: Context) {
+export function BilibiliTestPlugin(ctx: Context)
+{
 
     // ctx.on('before-send', (session) => {
     //      ctx.logger.info(session)
@@ -10,7 +11,6 @@ export function BilibiliTestPlugin(ctx: Context) {
     // ctx.on('send', (session) => {
     //      ctx.logger.info(session)
     // })
-
 
     // ctx.middleware(async (session, next) => {
     //     if (session.platform !== 'bilibili') return next()
@@ -40,7 +40,6 @@ export function BilibiliTestPlugin(ctx: Context) {
     //     return next()
     // })
 
-
     // 成功获取所有关注 UP 主的 20 条动态
     // 感觉这个返回也太多了
     // ctx.middleware(async (session, next) => {
@@ -54,7 +53,6 @@ export function BilibiliTestPlugin(ctx: Context) {
     //     }
     //     return next()
     // })
-
 
     /*
     获取单个动态详情 getDynamicDetail

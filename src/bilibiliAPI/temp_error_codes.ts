@@ -1,5 +1,6 @@
 // src\bilibiliAPI\temp_error_codes.ts
-export function getBilibiliErrorMessage(code: number): string {
+export function getBilibiliErrorMessage(code: number): string
+{
   const errorMessages: Record<number, string> = {
     // 权限类
     '-1': '应用程序不存在或已被封禁',
@@ -53,7 +54,7 @@ export function getBilibiliErrorMessage(code: number): string {
     '-701': '扣节操失败',
     '-799': '请求过于频繁，请稍后再试',
     '-8888': '对不起，服务器开小差了~ (ಥ﹏ಥ)'
-  }
+  };
 
-  return errorMessages[code.toString()] || `未知错误码: ${code}`
+  return errorMessages[code.toString()] || `未知错误码: ${code}`;
 }

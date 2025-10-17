@@ -13,7 +13,6 @@ Bilibili Direct Message Adapter For Koishi
 3. 在 Koishi 控制台中配置插件并启用
 4. 使用 APP 扫码登录获取认证信息
 
-
 ## 支持状态
 
 | 功能     | 状态 | 说明                 |
@@ -29,8 +28,6 @@ Bilibili Direct Message Adapter For Koishi
 | 消息撤回 | ✅    | 撤回已发消息         |
 | 语音消息 | ❌    | 不支持               |
 | 视频消息 | ❌    | 不支持               |
-
-
 
 ## 文档
 
