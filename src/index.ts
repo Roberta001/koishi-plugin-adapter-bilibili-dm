@@ -38,7 +38,11 @@ export const usage = `
 
 ---
 
-如果不希望bot响应消息，请配置 nestedblocked 配置项。
+
+需要注意：
+- 如果不希望bot响应消息，请配置 nestedblocked 配置项
+- B站API有调用频率限制，请合理控制调用频率
+- 返回的数据格式可能随B站API更新而变化
 
 ---
 `
