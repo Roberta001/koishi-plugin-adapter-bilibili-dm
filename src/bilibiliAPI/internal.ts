@@ -8,6 +8,7 @@ import { DynamicAPI } from './apis/dynamic'
 import { LiveRoomAPI } from './apis/liveRoom'
 import { logInfo, loggerError } from './../index'
 import { LiveWebSocketManager } from './apis/liveWebSocket'
+import { VideoAPI } from './apis/video'
 import {
     DynamicItem,
     FollowingUser,
@@ -18,7 +19,8 @@ import {
     SearchLiveUser,
     SearchArticle,
     ComprehensiveSearchResponse,
-    SearchOptions
+    SearchOptions,
+    VideoData
 } from './apis/types'
 
 export class Internal implements InternalInterface {
@@ -30,6 +32,7 @@ export class Internal implements InternalInterface {
     private liveAPI: LiveAPI
     private liveRoomAPI: LiveRoomAPI
     private liveWebSocketManager: LiveWebSocketManager
+    private videoAPI: VideoAPI
 
     constructor(bot: BilibiliDmBot, ctx: Context) {
         this.bot = bot
@@ -45,6 +48,9 @@ export class Internal implements InternalInterface {
         })
         // 设置 LiveRoomAPI 实例到 WebSocket 管理器
         this.liveWebSocketManager.setLiveRoomAPI(this.liveRoomAPI)
+
+        // 初始化 VideoAPI
+        this.videoAPI = new VideoAPI(bot)
 
         // 添加清理函数，确保插件停用时正确关闭WebSocket连接
         bot.addCleanup(() => {
@@ -364,5 +370,18 @@ export class Internal implements InternalInterface {
     isConnectedToLiveRoom(): boolean {
         return this.liveWebSocketManager.isConnectedToRoom()
     }
+
+    // #region 视频信息相关API
+
+    /**
+     * 解析视频信息，获取视频aid、cid等详细信息
+     * @param bvid 视频BV号
+     * @returns Promise<VideoData | null> 视频详细信息
+     */
+    async parseVideo(bvid: string): Promise<VideoData | null> {
+        return this.videoAPI.parseVideo(bvid)
+    }
+
+    // #endregion
 
 }

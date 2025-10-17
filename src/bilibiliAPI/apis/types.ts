@@ -897,6 +897,9 @@ export interface InternalInterface {
     manualLiveCheck(): Promise<void>
     getUserLiveStatus(mid: number): Promise<LiveUser | null>
     isUserLive(mid: number): Promise<boolean | null>
+
+    // 视频信息相关
+    parseVideo(bvid: string): Promise<VideoData | null>
 }
 
 // 直播间相关类型定义
@@ -1055,4 +1058,137 @@ export interface LiveChatEventData {
         timestamp: number
         raw: any            // 原始数据
     }
+}
+
+// 视频信息相关类型定义
+export interface VideoPage {
+    cid: number
+    page: number
+    from: string
+    part: string
+    duration: number
+    vid: string
+    weblink: string
+    dimension: {
+        width: number
+        height: number
+        rotate: number
+    }
+}
+
+export interface VideoOwner {
+    mid: number
+    name: string
+    face: string
+}
+
+export interface VideoStat {
+    aid: number
+    view: number
+    danmaku: number
+    reply: number
+    favorite: number
+    coin: number
+    share: number
+    now_rank: number
+    his_rank: number
+    like: number
+    dislike: number
+    evaluation: string
+    vt: number
+}
+
+export interface VideoRights {
+    bp: number
+    elec: number
+    download: number
+    movie: number
+    pay: number
+    hd5: number
+    no_reprint: number
+    autoplay: number
+    ugc_pay: number
+    is_cooperation: number
+    ugc_pay_preview: number
+    no_background: number
+    clean_mode: number
+    is_stein_gate: number
+    is_360: number
+    no_share: number
+    arc_pay: number
+    free_watch: number
+}
+
+export interface VideoDimension {
+    width: number
+    height: number
+    rotate: number
+}
+
+export interface VideoDescV2Item {
+    raw_text: string
+    type: number
+    biz_id: number
+}
+
+export interface VideoData {
+    bvid: string
+    aid: number
+    videos: number
+    tid: number
+    tid_v2: number
+    tname: string
+    tname_v2: string
+    copyright: number
+    pic: string
+    title: string
+    pubdate: number
+    ctime: number
+    desc: string
+    desc_v2: VideoDescV2Item[]
+    state: number
+    duration: number
+    mission_id?: number
+    redirect_url?: string
+    rights: VideoRights
+    owner: VideoOwner
+    stat: VideoStat
+    argue_info?: {
+        argue_msg: string
+        argue_type: number
+        argue_link: string
+    }
+    dynamic: string
+    cid: number
+    dimension: VideoDimension
+    premiere?: any
+    teenage_mode: number
+    is_chargeable_season: boolean
+    is_story: boolean
+    is_upower_exclusive: boolean
+    is_upower_play: boolean
+    is_upower_preview: boolean
+    no_cache: boolean
+    pages: VideoPage[]
+    subtitle: {
+        allow_submit: boolean
+        list: any[]
+    }
+    ugc_season?: any
+    staff?: any[]
+    is_season_display: boolean
+    user_garb?: any
+    honor_reply?: any
+    like_icon: string
+    need_jump_bv: boolean
+    disable_show_up_info: boolean
+    is_story_play: boolean
+    is_view_self: boolean
+}
+
+export interface VideoInfoResponse {
+    code: number
+    message: string
+    ttl: number
+    data: VideoData
 }
