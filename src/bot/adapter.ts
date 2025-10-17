@@ -100,7 +100,7 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot> {
           await bot.stop()
           logInfo(`机器人 ${bot.selfId} 已停止`)
         } catch (err) {
-          loggerError(`[${bot.selfId}] 停止机器人 ${bot.selfId} 时出错:`, err)
+          loggerError(`停止机器人 ${bot.selfId} 时出错:`, err)
         }
       }))
 
@@ -136,7 +136,7 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot> {
           bot.http.setCookieVerified(false)
         }
       } catch (error) {
-        loggerError(`[${pluginConfig.selfId}] 读取缓存cookie失败: `, error)
+        loggerError(`读取缓存cookie失败: `, error)
       }
     }
 
@@ -155,7 +155,7 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot> {
         bot.offline()
       }
     } catch (error) {
-      loggerError(`[${pluginConfig.selfId}] 机器人启动失败，错误详情: `, error)
+      loggerError(`机器人启动失败，错误详情: `, error)
       this.service.updateStatus(pluginConfig.selfId, {
         status: 'error',
         message: `启动失败: ${error.message || '未知错误'}`

@@ -184,7 +184,7 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>> {
       const selfId = data.selfId || config.selfId
       this.currentBot = selfId
 
-      logInfo(`[${selfId}] 当前机器人列表: ${ctx.bots.map(bot => `${bot.platform}:${bot.selfId}`).join(', ')}`)
+      logInfo(`当前机器人列表: ${ctx.bots.map(bot => `${bot.platform}:${bot.selfId}`).join(', ')}`)
 
       // 更新状态
       this.consoleMessages[selfId] = {
@@ -195,22 +195,22 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>> {
       this.refresh()
 
       // 创建新机器人实例
-      logInfo(`[${selfId}] 创建新机器人实例，使用selfId: ${selfId}`)
+      logInfo(`创建新机器人实例，使用selfId: ${selfId}`)
       const bot = new BilibiliDmBot(ctx, config)
       const sessionFile = resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm', `${selfId}.cookie.json`)
 
       // 检查是否存在cookie文件，如果存在则删除
       try {
         if (existsSync(sessionFile)) {
-          logInfo(`[${selfId}] 删除旧的cookie文件: ${sessionFile}`)
+          logInfo(`删除旧的cookie文件: ${sessionFile}`)
           await fs.unlink(sessionFile)
         }
       } catch (error) {
-        loggerError(`[${selfId}] 删除cookie文件失败: `, error)
+        loggerError(`删除cookie文件失败: `, error)
       }
 
       // 启动登录流程
-      logInfo(`[${selfId}] 开始启动登录流程...`)
+      logInfo(`开始启动登录流程...`)
       await this.service.startLogin(bot, sessionFile)
     })
   }
@@ -225,7 +225,7 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>> {
     // 如果有二维码，记录日志
     Object.values(statusData).forEach(status => {
       if (status.status === 'qrcode' && status.image) {
-        logInfo(`[${status.selfId}] 返回二维码数据给前端，图片数据长度: ${status.image.length} 字节`)
+        logInfo(`返回二维码数据给前端，图片数据长度: ${status.image.length} 字节`)
       }
     });
 
@@ -236,7 +236,7 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>> {
         }
         // 确保状态对象包含所有必要的字段
         if (!statusData[selfId].status) {
-          logInfo(`[${selfId}] 状态对象缺少status字段，设置为init`)
+          logInfo(`状态对象缺少status字段，设置为init`)
           statusData[selfId].status = 'init'
         }
         if (!statusData[selfId].message) {
@@ -265,20 +265,20 @@ export function apply(ctx: Context, config: PluginConfig) {
       }
     };
     loggerInfo = (message: any, ...args: any[]) => {
-      ctx.logger.info(message, ...args);
+      ctx.logger.info(`[${config.selfId}] `, message, ...args);
     };
     loggerError = (message: any, ...args: any[]) => {
       // 如果传入的是数字，认为是B站错误码
       if (typeof message === 'number') {
         const errorMessage = getBilibiliErrorMessage(message);
-        ctx.logger.error(`B站API错误 [${message}]: ${errorMessage}`, ...args);
+        ctx.logger.error(`[${config.selfId}] `, `B站API错误 [${message}]: ${errorMessage}`, ...args);
       } else {
-        ctx.logger.error(message, ...args);
+        ctx.logger.error(`[${config.selfId}] `, message, ...args);
       }
     };
     loginfolive = (message: any, ...args: any[]) => {
       if (config.loggerLiveInfo) {
-        logger.info(`[LiveChat] ${message}`, ...args);
+        logger.info(`[${config.selfId}] `, `[LiveChat] ${message}`, ...args);
       }
     };
 
@@ -328,7 +328,7 @@ export function apply(ctx: Context, config: PluginConfig) {
             botToStop.dispose(); // 彻底移除机器人实例
             logInfo(`机器人 ${botToStop.selfId} 已被彻底移除`);
           } catch (err) {
-            ctx.logger.error(`[${config.selfId}] 停止机器人 ${botToStop.selfId} 失败: ${err.message}`);
+            ctx.logger.error(`[${config.selfId}] `, `停止机器人 ${botToStop.selfId} 失败: ${err.message}`);
           }
         } else {
           logInfo(`未找到当前插件实例对应的机器人，无需停止。`);
@@ -336,12 +336,12 @@ export function apply(ctx: Context, config: PluginConfig) {
 
         logInfo(`插件停用完成`);
       } catch (err) {
-        ctx.logger.error(`[${config.selfId}] 插件停用过程中发生错误: ${err.message}`)
+        ctx.logger.error(`[${config.selfId}] `, `插件停用过程中发生错误: ${err.message}`)
       }
     })
 
   })
 
 
-  ctx.logger.info(`[${config.selfId}] Bilibili 私信适配器启动。`)
+  ctx.logger.info(`[${config.selfId}] `, `Bilibili 私信适配器启动。`)
 }

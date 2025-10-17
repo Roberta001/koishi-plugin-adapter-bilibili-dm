@@ -24,7 +24,7 @@ export class VideoAPI {
         try {
             // 验证BV号格式
             if (!bvid.startsWith('BV') || bvid.length < 10) {
-                loggerError(`[${this.bot.selfId}] 无效的BV号格式: ${bvid}`)
+                loggerError(`无效的BV号格式: ${bvid}`)
                 return null
             }
 
@@ -45,14 +45,14 @@ export class VideoAPI {
             )
 
             if (response.code === 0 && response.data) {
-                logInfo(`[${this.bot.selfId}] 成功获取视频信息: ${bvid}, 标题: ${response.data.title}`)
+                logInfo(`成功获取视频信息: ${bvid}, 标题: ${response.data.title}`)
                 return response.data
             } else {
-                loggerError(`[${this.bot.selfId}] 获取视频信息失败: ${bvid}, 错误码: ${response.code}, 消息: ${response.message}`)
+                loggerError(`获取视频信息失败: ${bvid}, 错误码: ${response.code}, 消息: ${response.message}`)
                 return null
             }
         } catch (error) {
-            loggerError(`[${this.bot.selfId}] 解析视频信息时发生错误: ${bvid}`, error)
+            loggerError(`解析视频信息时发生错误: ${bvid}`, error)
             return null
         }
     }
@@ -68,7 +68,7 @@ export class VideoAPI {
         try {
             // 验证URL格式
             if (!url || typeof url !== 'string') {
-                loggerError(`[${this.bot.selfId}] 无效的URL: ${url}`)
+                loggerError(`无效的URL: ${url}`)
                 return null
             }
 
@@ -86,14 +86,14 @@ export class VideoAPI {
             )
 
             if (response.code === 0) {
-                logInfo(`[${this.bot.selfId}] 成功使用外部API解析链接: ${url}`)
+                logInfo(`成功使用外部API解析链接: ${url}`)
                 return response
             } else {
-                loggerError(`[${this.bot.selfId}] 解析链接失败: ${url}, 错误码: ${response.code}, 消息: ${response.message}`)
+                loggerError(`解析链接失败: ${url}, 错误码: ${response.code}, 消息: ${response.message}`)
                 return response // 仍然返回响应，让调用者处理
             }
         } catch (error) {
-            loggerError(`[${this.bot.selfId}] 解析链接时发生错误: ${url}`, error)
+            loggerError(`解析链接时发生错误: ${url}`, error)
             return null
         }
     }

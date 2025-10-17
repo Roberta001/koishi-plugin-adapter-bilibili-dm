@@ -56,7 +56,7 @@ export class Internal implements InternalInterface {
         // 添加清理函数，确保插件停用时正确关闭WebSocket连接
         bot.addCleanup(() => {
             if (this.liveWebSocketManager) {
-                logInfo(`[${bot.selfId}] 插件停用，清理直播间WebSocket连接`)
+                logInfo(`插件停用，清理直播间WebSocket连接`)
                 this.liveWebSocketManager.dispose?.()
             }
         })

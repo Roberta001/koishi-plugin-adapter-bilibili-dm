@@ -124,7 +124,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
     this.consecutiveFailures++
 
     if (this.consecutiveFailures >= this.pluginConfig.pollAutoShutdownThreshold) {
-      loggerError(`[${this.selfId}] 连续轮询失败 ${this.consecutiveFailures} 次，达到自动关闭阈值 (${this.pluginConfig.pollAutoShutdownThreshold})，即将关闭插件`)
+      loggerError(`连续轮询失败 ${this.consecutiveFailures} 次，达到自动关闭阈值 (${this.pluginConfig.pollAutoShutdownThreshold})，即将关闭插件`)
       this.autoShutdown()
       return
     }
@@ -133,9 +133,9 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
       // 增加轮询间隔，最大不超过原间隔的5倍
       const multiplier = Math.min(Math.floor(this.consecutiveFailures / this.pluginConfig.pollFailureThreshold) + 1, 5)
       this.currentPollInterval = this.pluginConfig.pollInterval * multiplier
-      loggerError(`[${this.selfId}] 连续轮询失败 ${this.consecutiveFailures} 次，已增加轮询间隔至 ${this.currentPollInterval}ms (原间隔: ${this.pluginConfig.pollInterval}ms)`)
+      loggerError(`连续轮询失败 ${this.consecutiveFailures} 次，已增加轮询间隔至 ${this.currentPollInterval}ms (原间隔: ${this.pluginConfig.pollInterval}ms)`)
     } else {
-      loggerError(`[${this.selfId}] 连续轮询失败 ${this.consecutiveFailures} 次`)
+      loggerError(`连续轮询失败 ${this.consecutiveFailures} 次`)
     }
   }
 
@@ -166,16 +166,16 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
       }
 
       // 关闭插件     
-      loggerError(`[${this.selfId}] 正在关闭插件...`)
+      loggerError(`正在关闭插件...`)
       this.ctx.scope.dispose()
 
     } catch (error) {
-      loggerError(`[${this.selfId}] 自动关闭插件过程中发生错误: `, error)
+      loggerError(`自动关闭插件过程中发生错误: `, error)
       // 即使出错也要尝试关闭
       try {
         this.ctx.scope.dispose()
       } catch (disposeError) {
-        loggerError(`[${this.selfId}] 强制关闭插件失败: `, disposeError)
+        loggerError(`强制关闭插件失败: `, disposeError)
       }
     }
   }
@@ -199,7 +199,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
           logInfo(`上下文已不活跃，跳过设置延迟轮询定时器`)
           this.http.isDisposed = true
         } else {
-          loggerError(`[${this.selfId}]设置延迟轮询定时器时出错: `, err)
+          loggerError(`设置延迟轮询定时器时出错: `, err)
         }
       }
       return
@@ -232,7 +232,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
         if (err.code === 'INACTIVE_EFFECT') {
           logInfo(`上下文已不活跃，跳过设置延迟动态监听定时器`)
         } else {
-          loggerError(`[${this.selfId}]设置延迟动态监听定时器时出错: `, err)
+          loggerError(`设置延迟动态监听定时器时出错: `, err)
         }
       }
       return
@@ -269,7 +269,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
         if (err.code === 'INACTIVE_EFFECT') {
           logInfo(`上下文已不活跃，跳过设置延迟直播监听定时器`)
         } else {
-          loggerError(`[${this.selfId}]设置延迟直播监听定时器时出错: `, err)
+          loggerError(`设置延迟直播监听定时器时出错: `, err)
         }
       }
       return
@@ -301,7 +301,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
             logInfo(`关闭过程中，跳过轮询。`)
             return
           }
-          loggerError(`[${this.selfId}]轮询过程中发生错误: `, err)
+          loggerError(`轮询过程中发生错误: `, err)
         }
       }, this.currentPollInterval)
 
@@ -311,11 +311,11 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
           intervalId()
           logInfo(`轮询定时器已清除`)
         } catch (err) {
-          loggerError(`[${this.selfId}]清除轮询定时器时出错: `, err)
+          loggerError(`清除轮询定时器时出错: `, err)
         }
       })
     } catch (err) {
-      loggerError(`[${this.selfId}]设置轮询定时器时出错: `, err)
+      loggerError(`设置轮询定时器时出错: `, err)
     }
   }
 
@@ -384,7 +384,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
         logInfo(`关闭过程中，跳过轮询。`)
         return
       }
-      loggerError(`[${this.selfId}]轮询过程中发生错误: % o`, error)
+      loggerError(`轮询过程中发生错误: % o`, error)
       // 轮询异常，也算作失败
       this.handlePollFailure()
     }
@@ -574,7 +574,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
       try {
         cleanup()
       } catch (err) {
-        loggerError(`[${this.selfId}]执行清理函数时出错: `, err)
+        loggerError(`执行清理函数时出错: `, err)
       }
     }
     this.cleanupFunctions = []
@@ -909,7 +909,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
       await this.internal.enterLiveRoom(roomId)
       logInfo(`成功进入直播间 ${roomId}`)
     } catch (error) {
-      loggerError(`[${this.selfId}] 进入直播间 ${roomId} 失败:`, error)
+      loggerError(`进入直播间 ${roomId} 失败:`, error)
       throw error
     }
   }
@@ -925,7 +925,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig> {
         await this.internal.leaveLiveRoom()
         logInfo(`成功退出直播间 ${currentRoomId}`)
       } catch (error) {
-        loggerError(`[${this.selfId}] 退出直播间 ${currentRoomId} 失败:`, error)
+        loggerError(`退出直播间 ${currentRoomId} 失败:`, error)
         throw error
       }
     } else {

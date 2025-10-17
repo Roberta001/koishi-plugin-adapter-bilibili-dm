@@ -18,9 +18,9 @@ export class BilibiliService {
 
         ctx.on('dispose', () => {
             this.isDisposed = true
-            loggerInfo(`[${this.config.selfId}] 正在关闭连接 Bilibili ...`)
+            loggerInfo(`正在关闭连接 Bilibili ...`)
             delete this.status[this.config.selfId];
-            logInfo(`[${this.config.selfId}] 已从服务状态中移除`);
+            logInfo(`已从服务状态中移除`);
         })
     }
 
@@ -71,7 +71,7 @@ export class BilibiliService {
                 }
             }
         } catch (err) {
-            loggerError(`[${selfId}] 触发状态更新事件时出错: `, err)
+            loggerError(`触发状态更新事件时出错: `, err)
         }
     }
 
@@ -135,7 +135,7 @@ export class BilibiliService {
                         bot.user.nick = userInfo.nickname
                         bot.user.avatar = userInfo.avatar
 
-                        loggerInfo(`[${selfId}] 已使用缓存登录，欢迎回来，${userInfo.nickname} ！`)
+                        loggerInfo(`已使用缓存登录，欢迎回来，${userInfo.nickname} ！`)
 
                         logInfo(`登录成功，设置cookie并启动机器人`)
 
@@ -156,7 +156,7 @@ export class BilibiliService {
                         })
                     }
                 } catch (error) {
-                    loggerError(`[${selfId}] 无法加载缓存的登录信息，错误详情: `, error)
+                    loggerError(`无法加载缓存的登录信息，错误详情: `, error)
                     this.updateStatus(selfId, {
                         status: 'continue',
                         message: '无法加载缓存的登录信息，需要重新登录'
@@ -185,7 +185,7 @@ export class BilibiliService {
                         logInfo(`上下文已不活跃，跳过状态更新事件触发`)
                         this.isDisposed = true
                     } else {
-                        loggerError(`[${selfId}] 触发状态更新事件时出错: `, err)
+                        loggerError(`触发状态更新事件时出错: `, err)
                     }
                 }
             }
@@ -247,11 +247,11 @@ export class BilibiliService {
                         logInfo(`上下文已不活跃，跳过状态更新事件触发`)
                         this.isDisposed = true
                     } else {
-                        loggerError(`[${selfId}] 触发状态更新事件时出错: `, err)
+                        loggerError(`触发状态更新事件时出错: `, err)
                     }
                 }
             } catch (error) {
-                loggerError(`[${selfId}] 生成二维码图片失败: `, error)
+                loggerError(`生成二维码图片失败: `, error)
                 this.updateStatus(selfId, {
                     status: 'error',
                     message: `生成二维码失败: ${error.message || '未知错误'}`
@@ -288,7 +288,7 @@ export class BilibiliService {
                     bot.user.nick = userInfo.nickname
                     bot.user.avatar = userInfo.avatar
 
-                    loggerInfo(`[${selfId}] 已使用缓存登录，欢迎回来，${userInfo.nickname} ！`)
+                    loggerInfo(`已使用缓存登录，欢迎回来，${userInfo.nickname} ！`)
 
                     await bot.start()
                     bot.online()
@@ -306,7 +306,7 @@ export class BilibiliService {
                             logInfo(`上下文已不活跃，跳过状态更新事件触发`)
                             this.isDisposed = true
                         } else {
-                            loggerError(`[${selfId}] 触发状态更新事件时出错: `, err)
+                            loggerError(`触发状态更新事件时出错: `, err)
                         }
                     }
 
@@ -335,7 +335,7 @@ export class BilibiliService {
             return false
 
         } catch (error) {
-            loggerError(`[${selfId}] 登录过程中发生错误: `, error)
+            loggerError(`登录过程中发生错误: `, error)
             this.updateStatus(selfId, {
                 status: 'error',
                 message: `登录失败: ${error.message || '未知错误'}`

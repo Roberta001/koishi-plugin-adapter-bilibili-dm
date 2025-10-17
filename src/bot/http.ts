@@ -68,7 +68,7 @@ export class HttpClient {
         throw httpError;
       }
     } catch (error) {
-      loggerError(`[${this.selfId}] ${errorMessage}: ${error.message}`);
+      loggerError(`${errorMessage}: ${error.message}`);
       return defaultValue;
     }
   }
@@ -227,7 +227,7 @@ export class HttpClient {
       const res = await this.http.get<BiliApiResponse<MyInfoData>>('https://api.bilibili.com/x/space/myinfo');
 
       if (res.code !== 0) {
-        loggerError(`[${this.selfId}] 验证cookie失败，API返回错误: `, res);
+        loggerError(`验证cookie失败，API返回错误: `, res);
         this.setCookieVerified(false);
         return { nickname: '', avatar: '', isValid: false };
       }
@@ -292,7 +292,7 @@ export class HttpClient {
   async getNewSessions(begin_ts: number): Promise<NewSessionsData | null> {
     // 检查cookie是否存在
     if (!this.cookies || !this.cookies.SESSDATA || !this.cookies.bili_jct || !this.cookieVerified) {
-      loggerError(`[${this.selfId}] 轮询新会话失败: 未设置cookie或cookie无效`);
+      loggerError(`轮询新会话失败: 未设置cookie或cookie无效`);
       return null;
     }
 
@@ -307,21 +307,21 @@ export class HttpClient {
         }
       );
       if (res.code === 0) return res.data;
-      loggerError(`[${this.selfId}] 轮询新会话失败: `, res);
+      loggerError(`轮询新会话失败: `, res);
       return null;
-    }, `[${this.selfId}] 轮询新会话时发生网络错误`, null);
+    }, `轮询新会话时发生网络错误`, null);
   }
 
   async fetchSessionMessages(talker_id: number, session_type: number, begin_seqno: number): Promise<SessionMessagesData | null> {
     // 检查cookie是否已验证
     if (!this.cookieVerified) {
-      loggerError(`[${this.selfId}] 获取消息失败: 未设置cookie或cookie无效`);
+      loggerError(`获取消息失败: 未设置cookie或cookie无效`);
       return null;
     }
 
     // 检查cookie是否存在
     if (!this.cookies || !this.cookies.SESSDATA || !this.cookies.bili_jct) {
-      loggerError(`[${this.selfId}] 获取消息失败: 未设置cookie或cookie无效`);
+      loggerError(`获取消息失败: 未设置cookie或cookie无效`);
       return null;
     }
 
@@ -351,14 +351,14 @@ export class HttpClient {
         const transformedResText = resText.replace(/"msg_key":(\d+)/g, '"msg_key":"$1"');
         res = JSON.parse(transformedResText);
       } catch (e) {
-        loggerError(`[${this.selfId}] fetchSessionMessages JSON parse error: ${e.message}, raw: ${resText}`);
+        loggerError(`fetchSessionMessages JSON parse error: ${e.message}, raw: ${resText}`);
         return null;
       }
 
       if (res.code === 0) return res.data;
       logInfo(`获取用户 ${talker_id} 的消息失败: ${res.message} (错误码: ${res.code})`);
       return null;
-    }, `[${this.selfId}] 获取用户 ${talker_id} 的消息时发生网络错误`, null);
+    }, `获取用户 ${talker_id} 的消息时发生网络错误`, null);
   }
 
   async updateAck(talker_id: number, session_type: number, ack_seqno: number): Promise<void> {
@@ -469,7 +469,7 @@ export class HttpClient {
         const transformedResText = resText.replace(/"msg_key":(\d+)/g, '"msg_key":"$1"');
         res = JSON.parse(transformedResText);
       } catch (e) {
-        loggerError(`[${this.selfId}] sendMessage JSON parse error: ${e.message}, raw: ${resText}`);
+        loggerError(`sendMessage JSON parse error: ${e.message}, raw: ${resText}`);
         return null;
       }
 
