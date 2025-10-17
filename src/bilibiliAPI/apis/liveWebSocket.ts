@@ -1,5 +1,4 @@
 // src\bilibiliAPI\apis\liveWebSocket.ts
-import WebSocket from 'ws'
 import { BilibiliDmBot } from '../../bot/bot'
 import { logInfo, loggerError, loginfolive } from '../../index'
 import {
@@ -16,7 +15,7 @@ import {
 import * as zlib from 'node:zlib'
 
 export class LiveWebSocketManager {
-  private ws: WebSocket | null = null
+  private ws: globalThis.WebSocket | null = null
   private heartbeatTimer: NodeJS.Timeout | null = null
   private currentRoomId: number | null = null
   private isConnected = false
@@ -151,9 +150,9 @@ export class LiveWebSocketManager {
 
         loginfolive(`连接到: ${wsUrl}`)
 
-        this.ws = new WebSocket(wsUrl)
+        this.ws = this.bot.ctx.http.ws(wsUrl)
 
-        this.ws.on('open', () => {
+        this.ws.addEventListener('open', () => {
           loginfolive(`WebSocket连接已建立`)
           this.sendAuthPacket(danmakuInfo, roomInfo)
           this.isConnected = true
@@ -161,12 +160,13 @@ export class LiveWebSocketManager {
           resolve()
         })
 
-        this.ws.on('message', (data: Buffer) => {
+        this.ws.addEventListener('message', (event: MessageEvent) => {
+          const data = Buffer.from(event.data as ArrayBuffer)
           this.handleMessage(data, roomInfo)
         })
 
-        this.ws.on('close', (code, reason) => {
-          loginfolive(`连接关闭: ${code} ${reason}`)
+        this.ws.addEventListener('close', (event) => {
+          loginfolive(`连接关闭: ${event.code} ${event.reason}`)
           this.isConnected = false
           this.stopHeartbeat()
 
@@ -203,7 +203,7 @@ export class LiveWebSocketManager {
           }
         })
 
-        this.ws.on('error', (error) => {
+        this.ws.addEventListener('error', (error) => {
           loggerError(`[LiveWebSocket] WebSocket错误:`, error)
           reject(error)
         })
@@ -651,8 +651,7 @@ export class LiveWebSocketManager {
     this.reconnectAttempts = 0
 
     if (this.ws) {
-      // 移除所有事件监听器，防止触发重连
-      this.ws.removeAllListeners()
+      // 直接关闭 WebSocket 连接
       this.ws.close()
       this.ws = null
     }

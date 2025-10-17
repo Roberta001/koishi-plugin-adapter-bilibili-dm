@@ -58,13 +58,11 @@
     "@koishijs/client": "^5.29.4",
     "@koishijs/plugin-console": "^5.30.9",
     "qrcode": "^1.5.4",
-    "uuid": "^9.0.1",
-    "ws": "^8.18.3"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
     "@types/qrcode": "^1.5.5",
-    "@types/uuid": "^9.0.8",
-    "@types/ws": "^8.18.1"
+    "@types/uuid": "^9.0.8"
   }
 }
