@@ -28,7 +28,8 @@ export const reusable = true;
 export const filter = false;
 export { Config };
 
-const logger = new Logger(`DEV:${name}`);
+const devlogger = new Logger(`DEV:${name}`);
+const logger = new Logger(name);
 
 export const usage = `
 ---
@@ -282,7 +283,7 @@ export function apply(ctx: Context, config: PluginConfig)
     if (process.env.NODE_ENV === 'development' && !__dirname.includes('node_modules'))
     {
       await sleep(1 * 1000);  // 神秘步骤，可以保佑dev模式
-      // ctx.plugin(BilibiliTestPlugin);
+      // ctx.plugin(BilibiliTestPlugin)
     }
 
     // 初始化全局函数
@@ -290,12 +291,12 @@ export function apply(ctx: Context, config: PluginConfig)
     {
       if (config.loggerinfo)
       {
-        logger.info(message, ...args);
+        devlogger.info(message, ...args);
       }
     };
     loggerInfo = (message: any, ...args: any[]) =>
     {
-      ctx.logger.info(message, ...args);
+      logger.info(message, ...args);
     };
     loggerError = (message: any, ...args: any[]) =>
     {
@@ -303,17 +304,17 @@ export function apply(ctx: Context, config: PluginConfig)
       if (typeof message === 'number')
       {
         const errorMessage = getBilibiliErrorMessage(message);
-        ctx.logger.error(`错误码 [${message}]: ${errorMessage}`, ...args);
+        logger.error(`错误码 [${message}]: ${errorMessage}`, ...args);
       } else
       {
-        ctx.logger.error(message, ...args);
+        logger.error(message, ...args);
       }
     };
     loginfolive = (message: any, ...args: any[]) =>
     {
       if (config.loggerLiveInfo)
       {
-        logger.info(`[直播间] ${message}`, ...args);
+        devlogger.info(`[直播间] ${message}`, ...args);
       }
     };
 

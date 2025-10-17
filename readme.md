@@ -1,8 +1,11 @@
-# koishi-plugin-adapter-bilibili-dm
+# Bilibili Adapter for Koishi
 
-[![npm](https://img.shields.io/npm/v/koishi-plugin-adapter-bilibili-dm?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-adapter-bilibili-dm)  [![npm downloads](https://img.shields.io/npm/dm/koishi-plugin-adapter-bilibili-dm)](https://www.npmjs.com/package/koishi-plugin-adapter-bilibili-dm)
+[![npm version](https://img.shields.io/npm/v/koishi-plugin-adapter-bilibili-dm?color=blue)](https://www.npmjs.com/package/koishi-plugin-adapter-bilibili-dm)
+[![npm downloads](https://img.shields.io/npm/dm/koishi-plugin-adapter-bilibili-dm)](https://www.npmjs.com/package/koishi-plugin-adapter-bilibili-dm)
+[![platform](https://img.shields.io/badge/platform-Koishi-blueviolet)](https://koishi.chat/)
+[![license](https://img.shields.io/github/license/roberta001/koishi-plugin-adapter-bilibili-dm)](https://github.com/roberta001/koishi-plugin-adapter-bilibili-dm?tab=MIT-1-ov-file)
 
-Bilibili Direct Message Adapter For Koishi
+> 哔哩哔哩适配器
 
 ![preview.gif](https://raw.githubusercontent.com/Roberta001/koishi-plugin-adapter-bilibili-dm/refs/heads/docs/screenshot/preview.gif)
 

@@ -5,12 +5,12 @@
     <k-comment v-if="data" :type="getCommentType(data.status)">
       <template v-if="data.status === 'offline'">
         <p>机器人离线</p>
-        <k-button @click="startLogin(data.selfId)">重新登录</k-button>
+        <k-button class="relogin-button" @click="startLogin(data.selfId)">重新登录</k-button>
       </template>
 
       <template v-else-if="data.status === 'error'">
         <p>{{ data.message }}</p>
-        <k-button @click="startLogin(data.selfId)">重新登录</k-button>
+        <k-button class="relogin-button" @click="startLogin(data.selfId)">重新登录</k-button>
       </template>
 
       <template v-else-if="data.status === 'init'">
@@ -28,7 +28,7 @@
         <div class="status-icon success">
           <k-icon name="check-circle" />
         </div>
-        <k-button @click="startLogin(data.selfId)">重新登录</k-button>
+        <k-button class="relogin-button" @click="startLogin(data.selfId)">重新登录</k-button>
       </template>
 
       <template v-else-if="data.status === 'qrcode'">
@@ -64,18 +64,18 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch, onMounted, onUnmounted, inject } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted, inject } from 'vue';
 import { store, send } from "@koishijs/client";
 
 // 二维码状态
-const qrCodeExpired = ref(false)
-const qrCodeLoading = ref(false)
-const qrCodeTimer = ref<number | null>(null)
-const qrCodeExpiryTime = ref<number | null>(null)
+const qrCodeExpired = ref(false);
+const qrCodeLoading = ref(false);
+const qrCodeTimer = ref<number | null>(null);
+const qrCodeExpiryTime = ref<number | null>(null);
 
-const local = inject('manager.settings.local', ref({ name: '' })) as any
-const config = inject('manager.settings.config', ref({})) as any
-const current = inject('manager.settings.current', ref({})) as any
+const local = inject('manager.settings.local', ref({ name: '' })) as any;
+const config = inject('manager.settings.config', ref({})) as any;
+const current = inject('manager.settings.current', ref({})) as any;
 
 /*
 // 调试时 要取消注释
@@ -90,14 +90,17 @@ console.groupEnd()
 // 插件的预期名称 包名
 const PLUGIN_NAME = 'koishi-plugin-adapter-bilibili-dm';
 
-const data = computed(() => {
+const data = computed(() =>
+{
   // 名称不匹配，返回 null，阻止组件渲染
-  if (!local.value || local.value.name !== PLUGIN_NAME) {
+  if (!local.value || local.value.name !== PLUGIN_NAME)
+  {
     return null;
   }
 
   const currentSelfId = config.value?.selfId;
-  if (!currentSelfId) {
+  if (!currentSelfId)
+  {
     console.warn('[Bilibili DM] 无法获取当前配置的selfId');
     return null;
   }
@@ -107,13 +110,15 @@ const data = computed(() => {
 
   // 从 store 中获取对应服务ID的数据
   const serviceData = (store as any)[serviceId];
-  if (!serviceData) {
+  if (!serviceData)
+  {
     console.warn(`[Bilibili DM] 未找到服务 "${serviceId}" 的数据`);
     return null;
   }
 
   const instanceData = serviceData[currentSelfId];
-  if (!instanceData) {
+  if (!instanceData)
+  {
     console.log('[Bilibili DM] 未找到selfId为', currentSelfId, '的状态数据，创建初始状态');
     return {
       status: 'offline',
@@ -122,7 +127,8 @@ const data = computed(() => {
     };
   }
 
-  if (instanceData && (!instanceData.selfId || instanceData.selfId !== currentSelfId)) {
+  if (instanceData && (!instanceData.selfId || instanceData.selfId !== currentSelfId))
+  {
     console.log('[Bilibili DM] 状态对象的selfId不正确，修正为:', currentSelfId);
     instanceData.selfId = currentSelfId;
   }
@@ -132,70 +138,81 @@ const data = computed(() => {
 });
 
 // 监听状态变化
-watch(() => data.value?.status, (newStatus: string | undefined, oldStatus: string | undefined) => {
-  if (newStatus === 'qrcode') {
-    qrCodeLoading.value = false
-    startQrCodeExpiryTimer()
-  } else if (newStatus === 'error' && oldStatus === 'qrcode') {
+watch(() => data.value?.status, (newStatus: string | undefined, oldStatus: string | undefined) =>
+{
+  if (newStatus === 'qrcode')
+  {
+    qrCodeLoading.value = false;
+    startQrCodeExpiryTimer();
+  } else if (newStatus === 'error' && oldStatus === 'qrcode')
+  {
     // 如果从qrcode状态变为error状态，可能是二维码过期
-    qrCodeExpired.value = true
+    qrCodeExpired.value = true;
   }
-}, { immediate: true }) // 立即执行一次，以处理初始状态
+}, { immediate: true }); // 立即执行一次，以处理初始状态
 
 // 设置二维码过期计时器（二维码通常有效期为3分钟） B站好像是2分钟？
-function startQrCodeExpiryTimer() {
-  clearQrCodeExpiryTimer()
+function startQrCodeExpiryTimer()
+{
+  clearQrCodeExpiryTimer();
 
-  qrCodeExpiryTime.value = Date.now() + 3 * 60 * 1000 // 3分钟后过期
-  qrCodeExpired.value = false
+  qrCodeExpiryTime.value = Date.now() + 3 * 60 * 1000; // 3分钟后过期
+  qrCodeExpired.value = false;
 
   // 每秒更新剩余时间
-  qrCodeTimer.value = window.setInterval(() => {
-    if (!qrCodeExpiryTime.value) return
+  qrCodeTimer.value = window.setInterval(() =>
+  {
+    if (!qrCodeExpiryTime.value) return;
 
-    const timeLeft = Math.max(0, qrCodeExpiryTime.value - Date.now())
+    const timeLeft = Math.max(0, qrCodeExpiryTime.value - Date.now());
 
-    if (timeLeft <= 0) {
-      qrCodeExpired.value = true
-      clearQrCodeExpiryTimer()
+    if (timeLeft <= 0)
+    {
+      qrCodeExpired.value = true;
+      clearQrCodeExpiryTimer();
     }
-  }, 1000) as unknown as number
+  }, 1000) as unknown as number;
 }
 
 // 清除二维码过期计时器
-function clearQrCodeExpiryTimer() {
-  if (qrCodeTimer.value) {
-    window.clearInterval(qrCodeTimer.value)
-    qrCodeTimer.value = null
+function clearQrCodeExpiryTimer()
+{
+  if (qrCodeTimer.value)
+  {
+    window.clearInterval(qrCodeTimer.value);
+    qrCodeTimer.value = null;
   }
-  qrCodeExpiryTime.value = null
+  qrCodeExpiryTime.value = null;
 }
 
 // 组件卸载时清除计时器
-onUnmounted(() => {
-  clearQrCodeExpiryTimer()
-})
+onUnmounted(() =>
+{
+  clearQrCodeExpiryTimer();
+});
 
 // 启动登录
-function startLogin(selfId: string) {
-  qrCodeExpired.value = false
-  qrCodeLoading.value = true
+function startLogin(selfId: string)
+{
+  qrCodeExpired.value = false;
+  qrCodeLoading.value = true;
 
   const loginEventName = `bilibili-dm-${selfId}/start-login`;
   console.log(`[Bilibili DM] 发送登录请求到事件: ${loginEventName}, selfId: ${selfId}, config.value?.selfId: ${config.value?.selfId}`);
 
   send(loginEventName as any, {
     selfId: selfId || config.value?.selfId
-  })
+  });
 }
 
-function getCommentType(status?: string) {
-  if (!status) return 'warning'
-  if (status === 'init' || status === 'continue') return 'warning'
-  if (status === 'error') return 'error'
-  if (status === 'success') return 'success'
-  if (status === 'qrcode') return 'warning'
-  return 'warning'
+function getCommentType(status?: string)
+{
+  if (!status) return 'warning';
+  if (status === 'init' || status === 'continue') return 'warning';
+  if (status === 'error') return 'error';
+  if (status === 'success') return 'success';
+  if (status === 'qrcode') return 'warning';
+  return 'warning';
 }
 </script>
 
@@ -261,6 +278,10 @@ function getCommentType(status?: string) {
   .k-button {
     margin-top: 0.5rem;
     margin-bottom: 0.8rem;
+  }
+
+  .relogin-button {
+    border-width: 2px;
   }
 
   .k-progress {
