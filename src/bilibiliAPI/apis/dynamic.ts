@@ -1,5 +1,5 @@
 // src\bilibiliAPI\apis\dynamic.ts
-import { logInfo, loggerError } from '../../index';
+import { loginfolive, loggerError } from '../../index';
 import { BilibiliDmBot } from '../../bot/bot';
 import { Context } from 'koishi';
 import
@@ -15,6 +15,7 @@ import
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { getDataFilePath } from '../../bot/utils';
 
 export class DynamicAPI
 {
@@ -38,7 +39,7 @@ export class DynamicAPI
         this.ctx = ctx;
 
         // 设置数据文件路径
-        this.dataFilePath = path.resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm', 'bilibili-dynamic', 'recent-dynamics.json');
+        this.dataFilePath = getDataFilePath(ctx, this.bot.selfId, 'bilibili-dynamic', 'recent-dynamics.json');
 
         // 加载持久化数据
         this.loadRecentDynamics();
@@ -70,7 +71,7 @@ export class DynamicAPI
                 const parsed = JSON.parse(data);
                 this.recentDynamics = parsed.recentDynamics || [];
                 this.lastDynamicBaseline = parsed.lastBaseline || '0';
-                logInfo(`加载了 ${this.recentDynamics.length} 条最近动态记录`);
+                loginfolive(`加载了 ${this.recentDynamics.length} 条最近动态记录`);
             }
         } catch (error)
         {
@@ -146,13 +147,13 @@ export class DynamicAPI
      */
     async getPersonalDynamics(uid: string, offset?: string): Promise<DynamicItem[]>
     {
-        logInfo(`尝试获取 UP 主 ${uid} 的个人动态`);
+        loginfolive(`尝试获取 UP 主 ${uid} 的个人动态`);
         try
         {
             // 检查上下文和HTTP客户端是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文或HTTP客户端已停用，跳过获取个人动态');
+                loginfolive('上下文或HTTP客户端已停用，跳过获取个人动态');
                 return [];
             }
             const params: any = {
@@ -179,7 +180,7 @@ export class DynamicAPI
 
             if (res.code === 0 && res.data?.items)
             {
-                logInfo(`成功获取 UP 主 ${uid} 的 ${res.data.items.length} 条动态`);
+                loginfolive(`成功获取 UP 主 ${uid} 的 ${res.data.items.length} 条动态`);
                 return res.data.items;
             } else
             {
@@ -191,7 +192,7 @@ export class DynamicAPI
             // 如果是上下文停用错误，不记录错误
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，跳过获取个人动态');
+                loginfolive('上下文已停用，跳过获取个人动态');
                 return [];
             }
             loggerError(`获取 UP 主 ${uid} 动态时发生错误: `, error);
@@ -211,7 +212,7 @@ export class DynamicAPI
             // 检查上下文和HTTP客户端是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文或HTTP客户端已停用，跳过获取动态详情');
+                loginfolive('上下文或HTTP客户端已停用，跳过获取动态详情');
                 return null;
             }
 
@@ -234,7 +235,7 @@ export class DynamicAPI
 
             if (res.code === 0 && res.data?.item)
             {
-                logInfo(`成功获取动态 ${dynamicId} 的详情`);
+                loginfolive(`成功获取动态 ${dynamicId} 的详情`);
                 return res.data.item;
             } else
             {
@@ -246,7 +247,7 @@ export class DynamicAPI
             // 如果是上下文停用错误，不记录错误
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，跳过获取动态详情');
+                loginfolive('上下文已停用，跳过获取动态详情');
                 return null;
             }
             loggerError(`获取动态 ${dynamicId} 详情时发生错误: `, error);
@@ -267,7 +268,7 @@ export class DynamicAPI
             // 检查上下文和HTTP客户端是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文或HTTP客户端已停用，跳过获取动态');
+                loginfolive('上下文或HTTP客户端已停用，跳过获取动态');
                 return [];
             }
 
@@ -301,7 +302,7 @@ export class DynamicAPI
 
             if (res.code === 0 && res.data?.items)
             {
-                logInfo(`成功获取所有关注 UP 主的 ${res.data.items.length} 条动态`);
+                loginfolive(`成功获取所有关注 UP 主的 ${res.data.items.length} 条动态`);
 
                 // 更新 baseline
                 if (res.data.update_baseline)
@@ -320,7 +321,7 @@ export class DynamicAPI
             // 如果是上下文停用错误，不记录错误
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，跳过获取动态');
+                loginfolive('上下文已停用，跳过获取动态');
                 return [];
             }
             loggerError('获取所有关注 UP 主动态时发生错误: ', error);
@@ -336,21 +337,21 @@ export class DynamicAPI
     {
         if (this.isPolling)
         {
-            logInfo('动态监听已在运行中');
+            loginfolive('动态监听已在运行中');
             return;
         }
 
         // 检查上下文是否仍然活跃
         if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
         {
-            logInfo('上下文已停用，无法启动动态监听');
+            loginfolive('上下文已停用，无法启动动态监听');
             return;
         }
 
         this.pollInterval = interval;
         this.isPolling = true;
 
-        logInfo(`开始监听动态更新，轮询间隔: ${interval}ms`);
+        loginfolive(`开始监听动态更新，轮询间隔: ${interval}ms`);
 
         // 异步初始化最近动态列表，但不等待完成
         this.initializeRecentDynamics().catch(error =>
@@ -364,7 +365,7 @@ export class DynamicAPI
         // 再次检查上下文是否仍然活跃（初始化过程中可能已停用）
         if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
         {
-            logInfo('初始化过程中上下文已停用，停止启动动态监听');
+            loginfolive('初始化过程中上下文已停用，停止启动动态监听');
             this.isPolling = false;
             return;
         }
@@ -380,7 +381,7 @@ export class DynamicAPI
                     await this.checkForNewDynamics();
                 } else
                 {
-                    logInfo('上下文已停用，停止动态监听');
+                    loginfolive('上下文已停用，停止动态监听');
                     this.stopDynamicPolling();
                 }
             }, this.pollInterval);
@@ -388,7 +389,7 @@ export class DynamicAPI
         {
             if (error.message?.includes('inactive context'))
             {
-                logInfo('上下文已停用，无法创建定时器');
+                loginfolive('上下文已停用，无法创建定时器');
                 this.isPolling = false;
                 return;
             }
@@ -414,7 +415,7 @@ export class DynamicAPI
         }
 
         this.isPolling = false;
-        logInfo('已停止动态监听');
+        loginfolive('已停止动态监听');
     }
 
     /**
@@ -427,18 +428,18 @@ export class DynamicAPI
             // 检查上下文是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文已停用，跳过初始化');
+                loginfolive('上下文已停用，跳过初始化');
                 return;
             }
 
-            logInfo('正在初始化最近动态列表...');
+            loginfolive('正在初始化最近动态列表...');
 
             // 获取最新的动态列表
             const dynamics = await this.getAllFollowedDynamics();
 
             if (dynamics.length === 0)
             {
-                logInfo('未获取到任何动态，跳过初始化');
+                loginfolive('未获取到任何动态，跳过初始化');
                 return;
             }
 
@@ -449,12 +450,12 @@ export class DynamicAPI
             // 保存到文件
             this.saveRecentDynamics();
 
-            logInfo(`初始化最近动态列表完成，共 ${this.recentDynamics.length} 条动态，即将打印前5条视检：`);
+            loginfolive(`初始化最近动态列表完成，共 ${this.recentDynamics.length} 条动态，即将打印前5条视检：`);
 
             // 输出最新几条动态的信息用于调试
             this.recentDynamics.slice(0, 5).forEach((summary, index) =>
             {
-                logInfo(`  ${index + 1}. ${summary.authorName} (${summary.authorUid}) - ${summary.type} - ${new Date(summary.timestamp * 1000).toLocaleString()}`);
+                loginfolive(`  ${index + 1}. ${summary.authorName} (${summary.authorUid}) - ${summary.type} - ${new Date(summary.timestamp * 1000).toLocaleString()}`);
             });
 
         } catch (error)
@@ -462,7 +463,7 @@ export class DynamicAPI
             // 如果是上下文停用错误，不记录错误
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，跳过初始化');
+                loginfolive('上下文已停用，跳过初始化');
                 return;
             }
             loggerError('初始化最近动态列表时发生错误: ', error);
@@ -479,25 +480,25 @@ export class DynamicAPI
             // 检查上下文是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文已停用，跳过动态检查');
+                loginfolive('上下文已停用，跳过动态检查');
                 return;
             }
 
-            logInfo('开始检查新动态...');
+            loginfolive('开始检查新动态...');
 
             // 获取最新的前5条动态
             const dynamics = await this.getAllFollowedDynamics();
 
             if (dynamics.length === 0)
             {
-                logInfo('未获取到任何动态，跳过检查');
+                loginfolive('未获取到任何动态，跳过检查');
                 return;
             }
 
             const latestDynamics = dynamics.slice(0, 5);
             const latestSummaries = latestDynamics.map(dynamic => this.dynamicToSummary(dynamic));
 
-            logInfo(`获取到 ${latestSummaries.length} 条最新动态，开始比对...`);
+            loginfolive(`获取到 ${latestSummaries.length} 条最新动态，开始比对...`);
 
             // 检查是否有新动态
             const newDynamics: DynamicItem[] = [];
@@ -513,7 +514,7 @@ export class DynamicAPI
                 {
                     // 这是一条新动态
                     newDynamics.push(latestDynamics[i]);
-                    logInfo(`发现新动态: ${latestSummary.authorName} (${latestSummary.authorUid}) - ${latestSummary.type}`);
+                    loginfolive(`发现新动态: ${latestSummary.authorName} (${latestSummary.authorUid}) - ${latestSummary.type}`);
                 } else
                 {
                     // 检查内容是否有变化（通过hash比较）
@@ -522,14 +523,14 @@ export class DynamicAPI
                     {
                         // 动态内容有更新
                         newDynamics.push(latestDynamics[i]);
-                        logInfo(`发现动态更新: ${latestSummary.authorName} (${latestSummary.authorUid}) - ${latestSummary.type}`);
+                        loginfolive(`发现动态更新: ${latestSummary.authorName} (${latestSummary.authorUid}) - ${latestSummary.type}`);
                     }
                 }
             }
 
             if (newDynamics.length > 0)
             {
-                logInfo(`总共发现 ${newDynamics.length} 条新动态或更新`);
+                loginfolive(`总共发现 ${newDynamics.length} 条新动态或更新`);
 
                 // 更新最近动态列表
                 // 将新动态添加到列表前面，并保持最大数量限制
@@ -564,7 +565,7 @@ export class DynamicAPI
                 }
             } else
             {
-                logInfo('未发现新动态');
+                loginfolive('未发现新动态');
             }
 
         } catch (error)
@@ -572,7 +573,7 @@ export class DynamicAPI
             // 如果是上下文停用错误，停止轮询
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，停止动态监听');
+                loginfolive('上下文已停用，停止动态监听');
                 this.stopDynamicPolling();
                 return;
             }
@@ -590,7 +591,7 @@ export class DynamicAPI
             // 检查上下文是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文已停用，跳过事件触发');
+                loginfolive('上下文已停用，跳过事件触发');
                 return;
             }
 
@@ -615,7 +616,7 @@ export class DynamicAPI
             // 根据动态类型触发不同的事件
             const eventName = this.getDynamicEventName(dynamic.type);
 
-            logInfo(`触发动态事件: ${eventName}, UP主: ${author.name} (${author.mid})`);
+            loginfolive(`触发动态事件: ${eventName}, UP主: ${author.name} (${author.mid})`);
 
             // 触发通用动态更新事件
             this.ctx.emit('bilibili/dynamic-update' as keyof import('koishi').Events, eventData);
@@ -628,7 +629,7 @@ export class DynamicAPI
             // 如果是上下文停用错误，不记录错误
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，跳过事件触发');
+                loginfolive('上下文已停用，跳过事件触发');
                 return;
             }
             loggerError('触发动态事件时发生错误: ', error);
@@ -776,17 +777,17 @@ export class DynamicAPI
     {
         if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
         {
-            logInfo('上下文已停用，无法执行手动检查');
+            loginfolive('上下文已停用，无法执行手动检查');
             return;
         }
 
         if (!this.isPolling)
         {
-            logInfo('动态监听未启动，无法执行手动检查');
+            loginfolive('动态监听未启动，无法执行手动检查');
             return;
         }
 
-        logInfo('执行手动动态检查...');
+        loginfolive('执行手动动态检查...');
         await this.checkForNewDynamics();
     }
 }

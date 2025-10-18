@@ -4,9 +4,9 @@ import { BilibiliCookie, PluginConfig } from './types';
 import { BilibiliDmBot } from './bot';
 import { Context } from 'koishi';
 import QRCode from 'qrcode';
-import path from 'node:path';
 import { readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { getDataFilePath } from './utils';
 
 export class BilibiliService
 {
@@ -95,7 +95,7 @@ export class BilibiliService
         if (this.isDisposed) return;
         try
         {
-            const sessionFile = path.join(this.ctx.baseDir, 'data', 'adapter-bilibili-dm', `${selfId}.cookie.json`);
+            const sessionFile = getDataFilePath(this.ctx, selfId, `${selfId}.cookie.json`);
             await writeFile(sessionFile, JSON.stringify(cookieData, null, 2), 'utf8');
             logInfo(`Cookie data for ${selfId} saved to ${sessionFile}`);
         } catch (error)

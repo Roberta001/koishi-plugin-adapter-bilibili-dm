@@ -1,5 +1,5 @@
 // src\bilibiliAPI\apis\live.ts
-import { logInfo, loggerError } from '../../index';
+import { loginfolive, loggerError } from '../../index';
 import { BilibiliDmBot } from '../../bot/bot';
 import { Context } from 'koishi';
 import
@@ -14,6 +14,7 @@ import
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { getDataFilePath } from '../../bot/utils';
 
 export class LiveAPI
 {
@@ -35,7 +36,7 @@ export class LiveAPI
         this.ctx = ctx;
 
         // 设置数据文件路径
-        this.dataFilePath = path.resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm', 'bilibili-live', 'current-live-users.json');
+        this.dataFilePath = getDataFilePath(ctx, this.bot.selfId, 'bilibili-live', 'current-live-users.json');
 
         // 加载持久化数据
         this.loadCurrentLiveUsers();
@@ -66,7 +67,7 @@ export class LiveAPI
                 const data = fs.readFileSync(this.dataFilePath, 'utf-8');
                 const parsed = JSON.parse(data);
                 this.currentLiveUsers = parsed.currentLiveUsers || [];
-                logInfo(`加载了 ${this.currentLiveUsers.length} 个当前直播用户记录`);
+                loginfolive(`加载了 ${this.currentLiveUsers.length} 个当前直播用户记录`);
             }
         } catch (error)
         {
@@ -131,13 +132,13 @@ export class LiveAPI
      */
     async getLiveUsers(): Promise<LiveUser[] | null>
     {
-        logInfo('尝试获取当前正在直播的UP主列表');
+        loginfolive('尝试获取当前正在直播的UP主列表');
         try
         {
             // 检查上下文和HTTP客户端是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文或HTTP客户端已停用，跳过获取直播列表');
+                loginfolive('上下文或HTTP客户端已停用，跳过获取直播列表');
                 return [];
             }
 
@@ -159,10 +160,10 @@ export class LiveAPI
                 const liveUsers = res.data?.live_users?.items || [];
                 if (liveUsers.length > 0)
                 {
-                    logInfo(`成功获取 ${liveUsers.length} 个正在直播的UP主`);
+                    loginfolive(`成功获取 ${liveUsers.length} 个正在直播的UP主`);
                 } else
                 {
-                    logInfo(`当前没有UP主在直播 (Code: ${res.code})`);
+                    loginfolive(`当前没有UP主在直播 (Code: ${res.code})`);
                 }
                 return liveUsers;
             } else
@@ -175,7 +176,7 @@ export class LiveAPI
             // 如果是上下文停用错误，不记录错误
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，跳过获取直播列表');
+                loginfolive('上下文已停用，跳过获取直播列表');
                 return [];
             }
             loggerError('获取直播列表时发生错误: ', error);
@@ -192,21 +193,21 @@ export class LiveAPI
     {
         if (this.isPolling)
         {
-            logInfo('直播监听已在运行中');
+            loginfolive('直播监听已在运行中');
             return;
         }
 
         // 检查上下文是否仍然活跃
         if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
         {
-            logInfo('上下文已停用，无法启动直播监听');
+            loginfolive('上下文已停用，无法启动直播监听');
             return;
         }
 
         this.pollInterval = interval;
         this.isPolling = true;
 
-        logInfo(`开始监听直播状态更新，轮询间隔: ${interval}ms`);
+        loginfolive(`开始监听直播状态更新，轮询间隔: ${interval}ms`);
 
         // 异步初始化当前直播列表，但不等待完成
         this.initializeCurrentLiveUsers().catch(error =>
@@ -220,7 +221,7 @@ export class LiveAPI
         // 再次检查上下文是否仍然活跃（初始化过程中可能已停用）
         if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
         {
-            logInfo('初始化过程中上下文已停用，停止启动直播监听');
+            loginfolive('初始化过程中上下文已停用，停止启动直播监听');
             this.isPolling = false;
             return;
         }
@@ -236,7 +237,7 @@ export class LiveAPI
                     await this.checkForLiveStatusChanges();
                 } else
                 {
-                    logInfo('上下文已停用，停止直播监听');
+                    loginfolive('上下文已停用，停止直播监听');
                     this.stopLivePolling();
                 }
             }, this.pollInterval);
@@ -244,7 +245,7 @@ export class LiveAPI
         {
             if (error.message?.includes('inactive context'))
             {
-                logInfo('上下文已停用，无法创建定时器');
+                loginfolive('上下文已停用，无法创建定时器');
                 this.isPolling = false;
                 return;
             }
@@ -270,7 +271,7 @@ export class LiveAPI
         }
 
         this.isPolling = false;
-        logInfo('已停止直播监听');
+        loginfolive('已停止直播监听');
     }
 
     /**
@@ -283,11 +284,11 @@ export class LiveAPI
             // 检查上下文是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文已停用，跳过初始化');
+                loginfolive('上下文已停用，跳过初始化');
                 return;
             }
 
-            logInfo('正在初始化当前直播列表...');
+            loginfolive('正在初始化当前直播列表...');
 
             // 获取当前直播列表
             const liveUsers = await this.getLiveUsers();
@@ -295,13 +296,13 @@ export class LiveAPI
             // 如果获取失败，不进行初始化
             if (liveUsers === null)
             {
-                logInfo('由于网络错误无法获取直播列表，跳过初始化');
+                loginfolive('由于网络错误无法获取直播列表，跳过初始化');
                 return;
             }
 
             if (liveUsers.length === 0)
             {
-                logInfo('初始化完成：当前没有UP主在直播');
+                loginfolive('初始化完成：当前没有UP主在直播');
                 this.currentLiveUsers = [];
                 this.saveCurrentLiveUsers();
                 return;
@@ -313,12 +314,12 @@ export class LiveAPI
             // 保存到文件
             this.saveCurrentLiveUsers();
 
-            logInfo(`初始化当前直播列表完成，共 ${this.currentLiveUsers.length} 个UP主正在直播，即将打印前5个进行视检：`);
+            loginfolive(`初始化当前直播列表完成，共 ${this.currentLiveUsers.length} 个UP主正在直播，即将打印前5个进行视检：`);
 
             // 输出当前直播的UP主信息用于调试
             this.currentLiveUsers.slice(0, 5).forEach((summary, index) =>
             {
-                logInfo(`  ${index + 1}. ${summary.uname} (${summary.mid}) - 房间号: ${summary.room_id} - ${summary.title}`);
+                loginfolive(`  ${index + 1}. ${summary.uname} (${summary.mid}) - 房间号: ${summary.room_id} - ${summary.title}`);
             });
 
         } catch (error)
@@ -326,7 +327,7 @@ export class LiveAPI
             // 如果是上下文停用错误，不记录错误
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，跳过初始化');
+                loginfolive('上下文已停用，跳过初始化');
                 return;
             }
             loggerError('初始化当前直播列表时发生错误: ', error);
@@ -343,11 +344,11 @@ export class LiveAPI
             // 检查上下文是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文已停用，跳过直播状态检查');
+                loginfolive('上下文已停用，跳过直播状态检查');
                 return;
             }
 
-            logInfo('开始检查直播状态变化...');
+            loginfolive('开始检查直播状态变化...');
 
             // 获取当前直播列表
             const currentLiveUsers = await this.getLiveUsers();
@@ -355,13 +356,13 @@ export class LiveAPI
             // 如果获取失败，跳过本次检查
             if (currentLiveUsers === null)
             {
-                logInfo('由于网络错误无法获取直播列表，跳过本次状态检查');
+                loginfolive('由于网络错误无法获取直播列表，跳过本次状态检查');
                 return;
             }
 
             const currentSummaries = currentLiveUsers.map(user => this.liveUserToSummary(user));
 
-            logInfo(`获取到 ${currentSummaries.length} 个正在直播的UP主，开始比对...`);
+            loginfolive(`获取到 ${currentSummaries.length} 个正在直播的UP主，开始比对...`);
 
             // 检查新开播的UP主
             const newLiveUsers: LiveUser[] = [];
@@ -374,7 +375,7 @@ export class LiveAPI
                 {
                     // 这是一个新开播的UP主
                     newLiveUsers.push(currentLiveUsers[i]);
-                    logInfo(`发现新开播: ${currentSummary.uname} (${currentSummary.mid}) - ${currentSummary.title}`);
+                    loginfolive(`发现新开播: ${currentSummary.uname} (${currentSummary.mid}) - ${currentSummary.title}`);
                 } else
                 {
                     // 检查直播内容是否有变化（标题等）
@@ -382,7 +383,7 @@ export class LiveAPI
                     if (existingSummary.hash !== currentSummary.hash)
                     {
                         // 直播信息有更新（比如标题变了）
-                        logInfo(`发现直播信息更新: ${currentSummary.uname} (${currentSummary.mid}) - ${currentSummary.title}`);
+                        loginfolive(`发现直播信息更新: ${currentSummary.uname} (${currentSummary.mid}) - ${currentSummary.title}`);
                         // 触发直播更新事件
                         await this.emitLiveUpdateEvent(currentLiveUsers[i]);
                     }
@@ -398,14 +399,14 @@ export class LiveAPI
                 {
                     // 这个UP主已经下播了
                     endedLiveUsers.push(existingSummary);
-                    logInfo(`发现下播: ${existingSummary.uname} (${existingSummary.mid})`);
+                    loginfolive(`发现下播: ${existingSummary.uname} (${existingSummary.mid})`);
                 }
             }
 
             // 触发新开播事件
             if (newLiveUsers.length > 0)
             {
-                logInfo(`总共发现 ${newLiveUsers.length} 个新开播的UP主`);
+                loginfolive(`总共发现 ${newLiveUsers.length} 个新开播的UP主`);
                 for (const liveUser of newLiveUsers)
                 {
                     await this.emitLiveStartEvent(liveUser);
@@ -417,7 +418,7 @@ export class LiveAPI
             // 触发下播事件
             if (endedLiveUsers.length > 0)
             {
-                logInfo(`总共发现 ${endedLiveUsers.length} 个下播的UP主`);
+                loginfolive(`总共发现 ${endedLiveUsers.length} 个下播的UP主`);
                 for (const endedUser of endedLiveUsers)
                 {
                     await this.emitLiveEndEvent(endedUser);
@@ -428,7 +429,7 @@ export class LiveAPI
 
             if (newLiveUsers.length === 0 && endedLiveUsers.length === 0)
             {
-                logInfo('未发现直播状态变化');
+                loginfolive('未发现直播状态变化');
             }
 
             // 更新当前直播列表
@@ -440,7 +441,7 @@ export class LiveAPI
             // 如果是上下文停用错误，停止轮询
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，停止直播监听');
+                loginfolive('上下文已停用，停止直播监听');
                 this.stopLivePolling();
                 return;
             }
@@ -458,7 +459,7 @@ export class LiveAPI
             // 检查上下文是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文已停用，跳过事件触发');
+                loginfolive('上下文已停用，跳过事件触发');
                 return;
             }
 
@@ -479,7 +480,7 @@ export class LiveAPI
                 rawData: liveUser
             };
 
-            logInfo(`触发开播事件: UP主 ${liveUser.uname} (${liveUser.mid}) 开始直播 - ${liveUser.title}`);
+            loginfolive(`触发开播事件: UP主 ${liveUser.uname} (${liveUser.mid}) 开始直播 - ${liveUser.title}`);
 
             // 触发通用直播事件
             this.ctx.emit('bilibili/live-update' as keyof import('koishi').Events, eventData);
@@ -492,7 +493,7 @@ export class LiveAPI
             // 如果是上下文停用错误，不记录错误
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，跳过事件触发');
+                loginfolive('上下文已停用，跳过事件触发');
                 return;
             }
             loggerError('触发开播事件时发生错误: ', error);
@@ -509,7 +510,7 @@ export class LiveAPI
             // 检查上下文是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文已停用，跳过事件触发');
+                loginfolive('上下文已停用，跳过事件触发');
                 return;
             }
 
@@ -530,7 +531,7 @@ export class LiveAPI
                 rawData: endedUser
             };
 
-            logInfo(`触发下播事件: UP主 ${endedUser.uname} (${endedUser.mid}) 结束直播`);
+            loginfolive(`触发下播事件: UP主 ${endedUser.uname} (${endedUser.mid}) 结束直播`);
 
             // 触发通用直播事件
             this.ctx.emit('bilibili/live-update' as keyof import('koishi').Events, eventData);
@@ -543,7 +544,7 @@ export class LiveAPI
             // 如果是上下文停用错误，不记录错误
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，跳过事件触发');
+                loginfolive('上下文已停用，跳过事件触发');
                 return;
             }
             loggerError('触发下播事件时发生错误: ', error);
@@ -560,7 +561,7 @@ export class LiveAPI
             // 检查上下文是否仍然活跃
             if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
             {
-                logInfo('上下文已停用，跳过事件触发');
+                loginfolive('上下文已停用，跳过事件触发');
                 return;
             }
 
@@ -581,7 +582,7 @@ export class LiveAPI
                 rawData: liveUser
             };
 
-            logInfo(`触发直播更新事件: UP主 ${liveUser.uname} (${liveUser.mid}) 更新直播信息`);
+            loginfolive(`触发直播更新事件: UP主 ${liveUser.uname} (${liveUser.mid}) 更新直播信息`);
 
             // 触发通用直播事件
             this.ctx.emit('bilibili/live-update' as keyof import('koishi').Events, eventData);
@@ -594,7 +595,7 @@ export class LiveAPI
             // 如果是上下文停用错误，不记录错误
             if (error.code === 'INACTIVE_EFFECT')
             {
-                logInfo('上下文已停用，跳过事件触发');
+                loginfolive('上下文已停用，跳过事件触发');
                 return;
             }
             loggerError('触发直播更新事件时发生错误: ', error);
@@ -639,17 +640,17 @@ export class LiveAPI
     {
         if (!this.ctx.scope.isActive || this.bot.http.isDisposed)
         {
-            logInfo('上下文已停用，无法执行手动检查');
+            loginfolive('上下文已停用，无法执行手动检查');
             return;
         }
 
         if (!this.isPolling)
         {
-            logInfo('直播监听未启动，无法执行手动检查');
+            loginfolive('直播监听未启动，无法执行手动检查');
             return;
         }
 
-        logInfo('执行手动直播状态检查...');
+        loginfolive('执行手动直播状态检查...');
         await this.checkForLiveStatusChanges();
     }
 

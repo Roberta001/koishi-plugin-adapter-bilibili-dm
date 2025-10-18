@@ -10,7 +10,7 @@ import
 } from './types';
 
 import { existsSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { getDataFilePath } from '../../bot/utils';
 
 export class UserAPI
 {
@@ -307,8 +307,7 @@ export class UserAPI
     {
         try
         {
-            const baseDir = this.bot.ctx.baseDir;
-            const cookieFile = resolve(baseDir, 'data', 'adapter-bilibili-dm', `${uid}.cookie.json`);
+            const cookieFile = getDataFilePath(this.bot.ctx, uid, `${uid}.cookie.json`);
 
             logInfo(`检查cookie文件: ${cookieFile}`);
 

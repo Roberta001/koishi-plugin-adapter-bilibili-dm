@@ -11,6 +11,7 @@ import { Config } from './bot/schema';
 
 import { promises as fs, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { getDataFilePath } from './bot/utils';
 
 export let loggerError: (message: any, ...args: any[]) => void;
 export let loggerInfo: (message: any, ...args: any[]) => void;
@@ -120,7 +121,7 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>>
 
     logInfo(`BilibiliLauncher构造函数，serviceId: ${serviceId}, currentBot: ${this.currentBot}`);
 
-    const sessionFile = resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm', `${config.selfId}.cookie.json`);
+    const sessionFile = getDataFilePath(ctx, config.selfId, `${config.selfId}.cookie.json`);
     const hasCacheFile = existsSync(sessionFile);
 
     logInfo(`BilibiliLauncher初始化，缓存文件存在: ${hasCacheFile}`);
@@ -205,7 +206,7 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>>
       // 创建新机器人实例
       logInfo(`创建新机器人实例，使用selfId: ${selfId}`);
       const bot = new BilibiliDmBot(ctx, config);
-      const sessionFile = resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm', `${selfId}.cookie.json`);
+      const sessionFile = getDataFilePath(ctx, selfId, `${selfId}.cookie.json`);
 
       // 检查是否存在cookie文件，如果存在则删除
       try

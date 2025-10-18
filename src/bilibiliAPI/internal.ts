@@ -440,4 +440,17 @@ export class Internal implements InternalInterface
 
     // #endregion
 
+    // #region WBI 签名
+
+    /**
+     * 获取WBI签名
+     * @param params 需要签名的参数
+     * @returns Promise<{ w_rid: string, wts: number }> 包含 w_rid 和 wts 的签名对象
+     */
+    async getWbiSignature(params: Record<string, any>): Promise<{ w_rid: string; wts: number; }>
+    {
+        return this.bot.http.getWbiSignature(params);
+    }
+
+    // #endregion
 }

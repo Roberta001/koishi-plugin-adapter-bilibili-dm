@@ -7,6 +7,7 @@ import { BilibiliDmBot } from './bot';
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { getDataFilePath } from './utils';
 
 export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot>
 {
@@ -36,7 +37,7 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot>
   async start()
   {
     logInfo('Bilibili 私信适配器启动中...');
-    const dataDir = path.resolve(this.ctx.baseDir, 'data', 'adapter-bilibili-dm');
+    const dataDir = getDataFilePath(this.ctx, this.config.selfId);
     await fs.mkdir(dataDir, { recursive: true });
     logInfo(`数据目录已确保存在: ${dataDir}`);
 
@@ -46,7 +47,7 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot>
     const bot = new BilibiliDmBot(this.ctx, this.config);
     this.bots.push(bot);
 
-    const sessionFile = path.join(this.ctx.baseDir, 'data', 'adapter-bilibili-dm', `${selfId}.cookie.json`);
+    const sessionFile = getDataFilePath(this.ctx, selfId, `${selfId}.cookie.json`);
     logInfo(`机器人 ${selfId} 的会话文件路径: ${sessionFile}`);
 
     // 启动登录流程
@@ -67,7 +68,7 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot>
 
     logInfo(`开始fork过程，当前机器人ID: ${selfId}`);
 
-    const sessionFile = path.join(this.ctx.baseDir, 'data', 'adapter-bilibili-dm', `${selfId}.cookie.json`);
+    const sessionFile = getDataFilePath(this.ctx, selfId, `${selfId}.cookie.json`);
     const hasCacheFile = await fs.access(sessionFile).then(() => true).catch(() => false);
 
     logInfo(`开始fork过程，缓存文件存在: ${hasCacheFile}`);
@@ -133,7 +134,7 @@ export class BilibiliDmAdapter extends Adapter<Context, BilibiliDmBot>
 
     logInfo(`正在启动机器人...`);
 
-    const sessionFile = path.join(this.ctx.baseDir, 'data', 'adapter-bilibili-dm', `${pluginConfig.selfId}.cookie.json`);
+    const sessionFile = getDataFilePath(this.ctx, pluginConfig.selfId, `${pluginConfig.selfId}.cookie.json`);
     await fs.mkdir(path.dirname(sessionFile), { recursive: true });
 
     const hasCacheFile = await fs.access(sessionFile).then(() => true).catch(() => false);

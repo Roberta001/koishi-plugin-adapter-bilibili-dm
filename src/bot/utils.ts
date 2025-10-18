@@ -1,5 +1,7 @@
 // 工具函数集合
 import { logInfo } from '../index';
+import { Context } from 'koishi';
+import { resolve } from 'node:path';
 
 /**
  * 验证UID是否为有效的数字
@@ -82,4 +84,22 @@ export function filterValidBlockedUids(blockedUids: Array<{ name: string; uid: s
         }
         return isValid;
     });
+}
+
+/**
+ * 获取适配器的数据文件路径
+ * @param ctx Koishi 上下文
+ * @param selfId 机器人实例的 selfId
+ * @param subpaths 文件或子目录路径
+ * @returns 完整的文件路径
+ */
+export function getDataFilePath(ctx: Context, selfId: string, ...subpaths: string[]): string
+{
+    if (!selfId)
+    {
+        // 在没有 selfId 的情况下，直接返回基础数据目录
+        return resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm');
+    }
+    // 为每个 selfId 创建独立的子目录
+    return resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm', selfId, ...subpaths);
 }

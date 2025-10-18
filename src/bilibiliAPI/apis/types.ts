@@ -1341,4 +1341,7 @@ export interface InternalInterface
     // 视频信息相关
     getVideoInfo(bvid: string): Promise<VideoData | null>;
     parseExternalUrl(url: string, accessKey?: string): Promise<ExternalParseResponse | null>;
+
+    // WBI 签名
+    getWbiSignature(params: Record<string, any>): Promise<{ w_rid: string; wts: number; }>;
 }
