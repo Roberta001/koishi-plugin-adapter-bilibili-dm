@@ -109,6 +109,36 @@ await bot.deleteMessage('private:123456789', 'msg_key_123')
 
 以下所有方法均需要使用 `bot.internal.` 访问。
 
+## sign签名
+
+### getWbiSignature
+
+由于本插件没有集成的B站全部的API，因此你一定会有手动请求部分API的需求。
+
+那么你可以使用此方法获取签名，为Bilibili API请求生成WBI签名。
+
+这是调用许多B站API所必需的签名。
+
+```typescript
+getWbiSignature(params: Record<string, any>): Promise<Record<string, string | number>>
+```
+
+**参数:**
+- `params`: 需要签名的原始请求参数
+
+**返回值:** `Promise<Record<string, string | number>>` - 包含 `w_rid` 和 `wts` 的签名后参数
+
+**示例:**
+```typescript
+const baseParams = { bvid: 'BV17x411w7KC' };
+const signedParams = await bot.internal.getWbiSignature(baseParams);
+// signedParams 将包含 w_rid 和 wts
+// 然后可以将 { ...baseParams, ...signedParams } 用于请求
+const response = await bot.http.get('https://api.bilibili.com/x/web-interface/view', {
+  params: { ...baseParams, ...signedParams }
+});
+```
+
 ## 用户关注相关
 
 ### followUser
@@ -474,3 +504,73 @@ if (success) {
 }
 ```
 
+## 视频相关
+
+### getVideoInfo
+
+解析视频信息，获取视频aid、cid等详细信息。
+
+```typescript
+getVideoInfo(bvid: string): Promise<VideoData | null>
+```
+
+**参数:**
+- `bvid`: 视频BV号
+
+**返回值:** `Promise<VideoData | null>` - 视频信息
+
+**示例:**
+```typescript
+const videoInfo = await bot.internal.getVideoInfo('BV17x411w7KC')
+if (videoInfo) {
+  console.log(`视频标题: ${videoInfo.title}`)
+}
+```
+
+### parseExternalUrl
+
+通用解析函数，支持视频/番剧/直播/动态/专栏的链接解析。调用星之阁API获取直链信息。
+
+```typescript
+parseExternalUrl(url: string, accessKey?: string): Promise<ExternalParseResponse | null>
+```
+
+**参数:**
+- `url`: 需要解析的B站链接
+- `accessKey`: 大会员密钥（可选）
+
+**返回值:** `Promise<ExternalParseResponse | null>` - 解析结果
+
+**示例:**
+```typescript
+const parsed = await bot.internal.parseExternalUrl('https://www.bilibili.com/video/BV17x411w7KC/')
+if (parsed && parsed.code === 0) {
+  console.log('解析成功:', parsed.data)
+}
+```
+
+### getVideoConclusion
+
+获取视频的AI总结（视频看点）。
+
+```typescript
+getVideoConclusion(bvid: string, cid: number, up_mid: number): Promise<VideoConclusionData | null>
+```
+
+**参数:**
+- `bvid`: 视频BV号
+- `cid`: 视频CID
+- `up_mid`: UP主UID
+
+**返回值:** `Promise<VideoConclusionData | null>` - AI总结信息
+
+**示例:**
+```typescript
+// 假设已通过 getVideoInfo 获取了 videoInfo
+if (videoInfo) {
+  const conclusion = await bot.internal.getVideoConclusion(videoInfo.bvid, videoInfo.cid, videoInfo.owner.mid)
+  if (conclusion) {
+    console.log('AI总结:', conclusion.model_result.summary)
+  }
+}
+```
