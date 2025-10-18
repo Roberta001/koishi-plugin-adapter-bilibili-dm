@@ -5,7 +5,7 @@ import { Bot, Context, h, Fragment, Universal } from 'koishi';
 import { BilibiliMessageEncoder } from './messageEncoder';
 import { Internal } from '../bilibiliAPI/internal';
 import { logInfo, loggerError } from '../index';
-import { PrivateMessage } from './types';
+import { BilibiliCookie, PrivateMessage } from './types';
 import { PluginConfig } from './types';
 import { HttpClient } from './http';
 import { shouldBlockMessage } from './utils';
@@ -59,7 +59,7 @@ declare module 'koishi' {
         online: number;
       };
       message: {
-        type: 'danmaku' | 'gift' | 'welcome' | 'guard_buy' | 'super_chat' | 'other';
+        type: 'danmaku' | 'gift' | 'welcome' | 'guard_buy' | 'super_chat' | 'other' | 'interact' | 'entry_effect' | 'watched_change';
         data: any;
         timestamp: number;
         raw: any;
@@ -101,7 +101,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig>
       username: ''
     };
 
-    this.http = new HttpClient(this.ctx, this.pluginConfig);
+    this.http = new HttpClient(this.ctx, this.pluginConfig, this);
     this.lastPollTs = Date.now() - 20 * 1000; // 获取过去20秒的消息 (毫秒)
     this._maxCacheSize = this.pluginConfig.maxCacheSize || 1000;
     this.consecutiveFailures = 0;
@@ -681,6 +681,14 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig>
     this.cleanupFunctions = [];
 
     await super.stop();
+  }
+
+  async saveCookie(cookie: BilibiliCookie)
+  {
+    if (this.ctx.bilibili_dm_service)
+    {
+      await this.ctx.bilibili_dm_service.saveCookie(this.selfId, cookie);
+    }
   }
 
   async getSelf(): Promise<Universal.User>

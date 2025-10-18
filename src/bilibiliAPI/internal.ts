@@ -49,7 +49,7 @@ export class Internal implements InternalInterface
         this.liveWebSocketManager = new LiveWebSocketManager(bot, (data) =>
         {
             // 发送 bilibili/live-chat 事件
-            ; (this.ctx as any).emit('bilibili/live-chat', data);
+            ctx.emit('bilibili/live-chat', data);
         });
         // 设置 LiveRoomAPI 实例到 WebSocket 管理器
         this.liveWebSocketManager.setLiveRoomAPI(this.liveRoomAPI);

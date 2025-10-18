@@ -108,6 +108,18 @@ export interface UploadImageData
   img_size?: number; // 图片大小 (字节)
 }
 
+// 机器人登录保存的cookie
+export interface BilibiliCookie
+{
+  SESSDATA: string;
+  bili_jct: string;
+  DedeUserID: string;
+  wbi_img_key?: string;
+  wbi_sub_key?: string;
+  wbi_mixin_key?: string;
+  wbi_timestamp?: number;
+}
+
 // 机器人登录状态
 export type BotLoginStatus = {
   status: 'init' | 'qrcode' | 'continue' | 'success' | 'error' | 'offline';

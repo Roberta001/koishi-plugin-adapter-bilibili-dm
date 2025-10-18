@@ -1,10 +1,10 @@
 //  src\service.ts
 import { BotStatus, logInfo, loggerError, loggerInfo } from '../index';
-import { PluginConfig } from './types';
+import { BilibiliCookie, PluginConfig } from './types';
 import { BilibiliDmBot } from './bot';
 import { Context } from 'koishi';
 import QRCode from 'qrcode';
-
+import path from 'node:path';
 import { readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
@@ -87,6 +87,20 @@ export class BilibiliService
         } catch (err)
         {
             loggerError(`触发状态更新事件时出错: `, err);
+        }
+    }
+
+    async saveCookie(selfId: string, cookieData: BilibiliCookie)
+    {
+        if (this.isDisposed) return;
+        try
+        {
+            const sessionFile = path.join(this.ctx.baseDir, 'data', 'adapter-bilibili-dm', `${selfId}.cookie.json`);
+            await writeFile(sessionFile, JSON.stringify(cookieData, null, 2), 'utf8');
+            logInfo(`Cookie data for ${selfId} saved to ${sessionFile}`);
+        } catch (error)
+        {
+            loggerError(`Failed to save cookie for ${selfId}:`, error);
         }
     }
 
@@ -173,6 +187,9 @@ export class BilibiliService
 
                         await bot.start();
                         bot.online();
+
+                        // 登录成功后立即更新WBI密钥
+                        await bot.http.getWbiKeys();
 
                         return true;
                     } else
@@ -317,13 +334,16 @@ export class BilibiliService
                 if (pollResult.status === 'success' && pollResult.cookies)
                 {
                     logInfo(`二维码登录成功，设置cookie`);
-                    bot.http.setCookies(pollResult.cookies);
-                    await writeFile(sessionFile, JSON.stringify(pollResult.cookies), 'utf8');
+                    const newCookie: BilibiliCookie = {
+                        SESSDATA: pollResult.cookies.SESSDATA,
+                        bili_jct: pollResult.cookies.bili_jct,
+                        DedeUserID: pollResult.cookies.DedeUserID,
+                    };
+                    bot.http.setCookies(newCookie);
+                    await this.saveCookie(selfId, newCookie);
 
                     bot.http.setCookieVerified(true);
                     logInfo(`已设置cookie验证标志为true`);
-
-                    logInfo(`cookie已保存到文件: ${sessionFile}`);
 
                     const userInfo = await bot.http.getMyInfo();
 
@@ -342,6 +362,9 @@ export class BilibiliService
 
                     await bot.start();
                     bot.online();
+
+                    // 登录成功后立即更新WBI密钥
+                    await bot.http.getWbiKeys();
 
                     try
                     {

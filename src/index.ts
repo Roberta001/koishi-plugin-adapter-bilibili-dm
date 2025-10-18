@@ -89,6 +89,7 @@ declare module 'koishi' {
     'bilibili/live-start': (data: import('./bilibiliAPI/apis/types').LiveEventData) => void;
     'bilibili/live-end': (data: import('./bilibiliAPI/apis/types').LiveEventData) => void;
     'bilibili/live-info-update': (data: import('./bilibiliAPI/apis/types').LiveEventData) => void;
+    [key: `bilibili-dm-${string}/start-login`]: (data: { selfId: string; }) => void;
   }
 }
 
@@ -102,12 +103,6 @@ declare module '@koishijs/plugin-console' {
   }
 }
 
-declare module '@koishijs/plugin-console' {
-  interface Events
-  {
-    [key: `bilibili-dm-${string}/start-login`]: (data: { selfId: string; }) => void;
-  }
-}
 
 // 创建数据服务
 export class BilibiliLauncher extends DataService<Record<string, BotStatus>>
@@ -190,10 +185,9 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>>
     });
 
     // 前端发来的登录请求
-    const loginEventName = `bilibili-dm-${config.selfId}/start-login`;
-    logInfo(`注册登录事件监听器: ${loginEventName}`);
+    const loginEventName = `bilibili-dm-${config.selfId}/start-login` as const;
 
-    ctx.console.addListener(loginEventName as any, async (data: { selfId: string; }) =>
+    ctx.on(loginEventName, async (data: { selfId: string; }) =>
     {
       const selfId = data.selfId || config.selfId;
       this.currentBot = selfId;

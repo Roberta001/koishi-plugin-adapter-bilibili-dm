@@ -1,6 +1,7 @@
 //  src\http.ts
-import { BiliApiResponse, MyInfoData, QrCodeData, QrCodePollResult, UploadImageData, WbiKeys, NavWbiImg, NewSessionsData, SessionMessagesData, BiliSendMessageResponseData } from './types';
+import { BiliApiResponse, MyInfoData, QrCodeData, QrCodePollResult, UploadImageData, WbiKeys, NavWbiImg, NewSessionsData, SessionMessagesData, BiliSendMessageResponseData, BilibiliCookie } from './types';
 import { logInfo, loggerError, loggerInfo } from '../index';
+import { BilibiliDmBot } from './bot';
 import { Context, Quester } from 'koishi';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,11 +16,11 @@ const MIXIN_KEY_ENCODE_TABLE = [
 
 export class HttpClient
 {
-  private cookies: Record<string, string> = {};
+  private cookies: BilibiliCookie = {} as BilibiliCookie;
   private biliJct: string = '';
   private readonly deviceId: string;
   private wbiKeys: WbiKeys | null = null;
-  private wbiKeysExpire = 0;
+  private wbiKeysTimestamp = 0;
   private wbiKeysFetchPromise: Promise<WbiKeys> | null = null; // 作为锁
   private avatarBase64: boolean;
   private selfId: string;
@@ -85,7 +86,7 @@ export class HttpClient
     }
   }
 
-  constructor(private ctx: Context, config?: any)
+  constructor(private ctx: Context, config?: any, private bot?: BilibiliDmBot)
   {
     this.selfId = config?.selfId || (ctx.bilibili_dm_service)?.config?.selfId || 'unknown';
     const effectiveConfig = config || (ctx.bilibili_dm_service)?.config || {};
@@ -109,17 +110,28 @@ export class HttpClient
     });
   }
 
-  setCookies(cookies: Record<string, string>)
+  setCookies(cookies: BilibiliCookie)
   {
     this.cookies = cookies;
     this.biliJct = cookies.bili_jct || '';
-    const cookieString = Object.entries(cookies).map(([k, v]) => `${k}=${v}`).join('; ');
+    const cookieString = Object.entries(cookies)
+      .filter(([key]) => !key.startsWith('wbi_'))
+      .map(([k, v]) => `${k}=${v}`).join('; ');
 
-    // 更新默认cookie
     if (this.http.config.headers)
     {
       (this.http.config.headers as Record<string, string>)['Cookie'] = cookieString;
     }
+
+    if (cookies.wbi_img_key && cookies.wbi_sub_key && cookies.wbi_timestamp)
+    {
+      this.wbiKeys = {
+        img_key: cookies.wbi_img_key,
+        sub_key: cookies.wbi_sub_key,
+      };
+      this.wbiKeysTimestamp = cookies.wbi_timestamp;
+    }
+
     logInfo(`成功设置cookie，长度: ${cookieString.length}`);
   }
 
@@ -144,37 +156,65 @@ export class HttpClient
     return temp.slice(0, 32);
   }
 
-  private async getWbiKeys(): Promise<WbiKeys>
+  public async getWbiKeys(): Promise<WbiKeys>
   {
-    // keys有效
-    if (this.wbiKeys && this.wbiKeysExpire > Date.now()) return this.wbiKeys;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startOfToday = today.getTime();
 
-    // 已经有一个请求在获取keys，等待
+    // Check memory cache.
+    if (this.wbiKeys && this.wbiKeysTimestamp >= startOfToday)
+    {
+      return this.wbiKeys;
+    }
+    // Check file cache
+    if (this.cookies.wbi_timestamp && this.cookies.wbi_img_key && this.cookies.wbi_sub_key && this.cookies.wbi_mixin_key)
+    {
+      if (this.cookies.wbi_timestamp >= startOfToday)
+      {
+        logInfo('从cookie文件加载WBI密钥');
+        this.wbiKeys = {
+          img_key: this.cookies.wbi_img_key,
+          sub_key: this.cookies.wbi_sub_key,
+        };
+        this.wbiKeysTimestamp = this.cookies.wbi_timestamp;
+        return this.wbiKeys;
+      }
+    }
+
     if (this.wbiKeysFetchPromise)
     {
       return this.wbiKeysFetchPromise;
     }
 
-    // 创建一个新的Promise作为锁
     this.wbiKeysFetchPromise = this.safeRequest(async () =>
     {
-      // 再次检查，可能在等待过程中已经有其他请求获取了keys
-      if (this.wbiKeys && this.wbiKeysExpire > Date.now()) return this.wbiKeys;
-
       logInfo('WBI密钥已过期或未找到，正在从API获取新密钥...');
       const res = await this.http.get<BiliApiResponse<{ wbi_img: NavWbiImg; }>>('https://api.bilibili.com/x/web-interface/nav', {
-        headers: {
-          'Referer': 'https://www.bilibili.com/',
-          'Origin': 'https://www.bilibili.com'
-        }
+        headers: { 'Referer': 'https://www.bilibili.com/', 'Origin': 'https://www.bilibili.com' }
       });
+
       if (res.code === 0 && res.data?.wbi_img?.img_url && res.data?.wbi_img?.sub_url)
       {
-        this.wbiKeys = {
-          img_key: res.data.wbi_img.img_url.substring(res.data.wbi_img.img_url.lastIndexOf('/') + 1, res.data.wbi_img.img_url.lastIndexOf('.')),
-          sub_key: res.data.wbi_img.sub_url.substring(res.data.wbi_img.sub_url.lastIndexOf('/') + 1, res.data.wbi_img.sub_url.lastIndexOf('.')),
-        };
-        this.wbiKeysExpire = Date.now() + 10 * 60 * 1000;
+        const imgKey = res.data.wbi_img.img_url.substring(res.data.wbi_img.img_url.lastIndexOf('/') + 1, res.data.wbi_img.img_url.lastIndexOf('.'));
+        const subKey = res.data.wbi_img.sub_url.substring(res.data.wbi_img.sub_url.lastIndexOf('/') + 1, res.data.wbi_img.sub_url.lastIndexOf('.'));
+
+        const mixinKey = this.getMixinKey(imgKey + subKey);
+
+        this.wbiKeys = { img_key: imgKey, sub_key: subKey };
+        const timestamp = Date.now();
+        this.wbiKeysTimestamp = timestamp;
+
+        this.cookies.wbi_img_key = imgKey;
+        this.cookies.wbi_sub_key = subKey;
+        this.cookies.wbi_mixin_key = mixinKey;
+        this.cookies.wbi_timestamp = timestamp;
+
+        if (this.bot)
+        {
+          await this.bot.saveCookie(this.cookies);
+        }
+
         logInfo('WBI密钥获取并缓存成功。');
         return this.wbiKeys;
       }
@@ -189,8 +229,12 @@ export class HttpClient
 
   private async signWithWbi(params: Record<string, any>): Promise<{ w_rid: string, wts: number; }>
   {
-    const keys = await this.getWbiKeys();
-    const mixinKey = this.getMixinKey(keys.img_key + keys.sub_key);
+    await this.getWbiKeys();
+    const mixinKey = this.cookies.wbi_mixin_key;
+    if (!mixinKey)
+    {
+      throw new Error('无法获取 mixinKey，请检查 WBI 密钥是否正确获取和缓存');
+    }
     const currTime = Math.round(Date.now() / 1000);
 
     const signedParams: Record<string, any> = { ...params, wts: currTime };
