@@ -6,7 +6,9 @@ import
     VideoData,
     VideoInfoResponse,
     BilibiliError,
-    ExternalParseResponse
+    ExternalParseResponse,
+    BilibiliResponse,
+    VideoConclusionData
 } from './types';
 
 export class VideoAPI
@@ -110,6 +112,49 @@ export class VideoAPI
         } catch (error)
         {
             loggerError(`解析链接时发生错误: ${url}`, error);
+            return null;
+        }
+    }
+
+    /**
+     * 获取视频的AI总结（视频看点）
+     * @param bvid 视频BV号
+     * @param cid 视频CID
+     * @param up_mid UP主UID
+     * @returns Promise<VideoConclusionData | null> AI总结信息
+     */
+    async getVideoConclusion(bvid: string, cid: number, up_mid: number): Promise<VideoConclusionData | null>
+    {
+        try
+        {
+            // 构建请求参数
+            const baseParams = { bvid, cid, up_mid };
+            const signedParams = await this.bot.http.getWbiSignature(baseParams);
+
+            // 调用B站API获取视频AI总结
+            const response = await this.bot.http.http.get<BilibiliResponse<VideoConclusionData>>(
+                'https://api.bilibili.com/x/web-interface/view/conclusion/get',
+                {
+                    params: { ...baseParams, ...signedParams },
+                    headers: {
+                        'Referer': `https://www.bilibili.com/video/${bvid}`,
+                        'Origin': 'https://www.bilibili.com'
+                    }
+                }
+            );
+
+            if (response.code === 0 && response.data)
+            {
+                logInfo(`成功获取视频AI总结: ${bvid}`);
+                return response.data;
+            } else
+            {
+                loggerError(`获取视频AI总结失败: ${bvid}, 错误码: ${response.code}, 消息: ${response.message}`);
+                return null;
+            }
+        } catch (error)
+        {
+            loggerError(`获取视频AI总结时发生错误: ${bvid}`, error);
             return null;
         }
     }

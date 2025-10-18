@@ -1197,6 +1197,37 @@ export interface VideoInfoResponse
     data: VideoData;
 }
 
+// 视频AI总结相关类型定义
+export interface VideoConclusionPartOutline
+{
+    timestamp: number;
+    content: string;
+}
+
+export interface VideoConclusionOutline
+{
+    title: string;
+    part_outline: VideoConclusionPartOutline[];
+    timestamp: number;
+}
+
+export interface VideoConclusionModelResult
+{
+    result_type: number;
+    summary: string;
+    outline: VideoConclusionOutline[] | null;
+}
+
+export interface VideoConclusionData
+{
+    code: number;
+    model_result: VideoConclusionModelResult;
+    stid: string;
+    status: number;
+    like_num: number;
+    dislike_num: number;
+}
+
 export interface ExternalParseResponse
 {
     code: number;
@@ -1341,6 +1372,7 @@ export interface InternalInterface
     // 视频信息相关
     getVideoInfo(bvid: string): Promise<VideoData | null>;
     parseExternalUrl(url: string, accessKey?: string): Promise<ExternalParseResponse | null>;
+    getVideoConclusion(bvid: string, cid: number, up_mid: number): Promise<VideoConclusionData | null>;
 
     // WBI 签名
     getWbiSignature(params: Record<string, any>): Promise<{ w_rid: string; wts: number; }>;

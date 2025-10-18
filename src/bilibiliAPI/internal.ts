@@ -22,7 +22,8 @@ import
     ComprehensiveSearchResponse,
     SearchOptions,
     VideoData,
-    ExternalParseResponse
+    ExternalParseResponse,
+    VideoConclusionData
 } from './apis/types';
 
 export class Internal implements InternalInterface
@@ -424,6 +425,18 @@ export class Internal implements InternalInterface
     async getVideoInfo(bvid: string): Promise<VideoData | null>
     {
         return this.videoAPI.getVideoInfo(bvid);
+    }
+
+    /**
+     * 获取视频的AI总结（视频看点）
+     * @param bvid 视频BV号
+     * @param cid 视频CID
+     * @param up_mid UP主UID
+     * @returns Promise<VideoConclusionData | null> AI总结信息
+     */
+    async getVideoConclusion(bvid: string, cid: number, up_mid: number): Promise<VideoConclusionData | null>
+    {
+        return this.videoAPI.getVideoConclusion(bvid, cid, up_mid);
     }
 
     /**
