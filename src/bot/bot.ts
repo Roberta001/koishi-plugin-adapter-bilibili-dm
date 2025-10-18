@@ -1031,7 +1031,7 @@ export class BilibiliDmBot extends Bot<Context, PluginConfig>
       logInfo(`成功发送撤回消息指令给 ${talkerId}，msg_key: ${msgKey} `);
     } else
     {
-      this.ctx.logger.warn(`发送撤回消息指令失败给 ${talkerId}，msg_key: ${messageId} `);
+      loggerError(`发送撤回消息指令失败给 ${talkerId}，msg_key: ${messageId} `);
     }
   }
 

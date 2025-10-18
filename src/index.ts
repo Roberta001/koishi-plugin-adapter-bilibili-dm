@@ -371,7 +371,7 @@ export function apply(ctx: Context, config: PluginConfig)
             logInfo(`机器人 ${botToStop.selfId} 已被彻底移除`);
           } catch (err)
           {
-            ctx.logger.error(`停止机器人 ${botToStop.selfId} 失败: ${err.message}`);
+            logger.error(`停止机器人 ${botToStop.selfId} 失败: ${err.message}`);
           }
         } else
         {
@@ -381,11 +381,11 @@ export function apply(ctx: Context, config: PluginConfig)
         logInfo(`插件停用完成`);
       } catch (err)
       {
-        ctx.logger.error(`插件停用过程中发生错误: ${err.message}`);
+        logger.error(`插件停用过程中发生错误: ${err.message}`);
       }
     });
 
   });
 
-  ctx.logger.info(`Bilibili 私信适配器启动。`);
+  logger.info(`Bilibili 私信适配器启动。`);
 }
