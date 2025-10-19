@@ -15,20 +15,103 @@ export class BilibiliMessageEncoder extends MessageEncoder<Context, BilibiliDmBo
         }
     }
 
+    /**
+     * 计算字符串的字符数
+     * @param text 要计算的字符串
+     * @returns 字符数
+     */
+    private calculateCharCount(text: string): number
+    {
+        let count = 0;
+        for (const char of text)
+        {
+            if (char === '\n')
+            {
+                count += 2;
+            } else
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
     private async flushTextBuffer(): Promise<void>
     {
-        if (this.textBuffer)
-        {
-            const [type, talkerId] = this.channelId.split(':');
-            if (type !== 'private' || !talkerId) return;
+        if (!this.textBuffer) return;
 
-            const msgContent = { content: this.textBuffer.replace(/\n+/g, '\n').trim() };
-            const msgKey = await this.bot.http.sendMessage(this.bot.selfId, Number(talkerId), JSON.stringify(msgContent), 1);
-            if (msgKey)
+        const [type, talkerId] = this.channelId.split(':');
+        if (type !== 'private' || !talkerId) return;
+
+        const MAX_LENGTH = 470; // B站限制500字符，这里留一些余地
+        let textToSend = this.textBuffer.replace(/\n+/g, '\n').trim();
+        this.textBuffer = '';
+
+        while (this.calculateCharCount(textToSend) > 0)
+        {
+            let currentChunk = '';
+            // 如果剩余文本长度超过最大限制，则进行切分
+            if (this.calculateCharCount(textToSend) > MAX_LENGTH)
             {
-                this.results.push({ id: msgKey });
+                let splitPoint = -1;
+                // 寻找合适的切分点（优先在换行符处切分）
+                for (let i = 0; i < textToSend.length; i++)
+                {
+                    const substring = textToSend.substring(0, i + 1);
+                    if (this.calculateCharCount(substring) > MAX_LENGTH)
+                    {
+                        break;
+                    }
+                    if (textToSend[i] === '\n')
+                    {
+                        splitPoint = i;
+                    }
+                }
+
+                // 如果找到了换行符作为切分点
+                if (splitPoint !== -1)
+                {
+                    currentChunk = textToSend.substring(0, splitPoint);
+                    textToSend = textToSend.substring(splitPoint + 1);
+                } else
+                {
+                    // 如果没有找到换行符，则硬切分
+                    let endIndex = 0;
+                    let currentLength = 0;
+                    for (let i = 0; i < textToSend.length; i++)
+                    {
+                        const char = textToSend[i];
+                        const charLength = char === '\n' ? 2 : 1;
+                        if (currentLength + charLength > MAX_LENGTH)
+                        {
+                            break;
+                        }
+                        currentLength += charLength;
+                        endIndex = i + 1;
+                    }
+                    currentChunk = textToSend.substring(0, endIndex);
+                    textToSend = textToSend.substring(endIndex);
+                }
+            } else
+            {
+                currentChunk = textToSend;
+                textToSend = '';
             }
-            this.textBuffer = '';
+
+            if (currentChunk.trim().length > 0)
+            {
+                const msgContent = { content: currentChunk };
+                const msgKey = await this.bot.http.sendMessage(this.bot.selfId, Number(talkerId), JSON.stringify(msgContent), 1);
+                if (msgKey)
+                {
+                    this.results.push({ id: msgKey });
+                }
+                // 在发送多条消息之间添加一个小的延迟，以避免被B站API限速
+                if (textToSend.length > 0)
+                {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
         }
     }
 
