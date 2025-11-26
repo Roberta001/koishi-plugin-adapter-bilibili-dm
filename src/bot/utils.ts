@@ -10,7 +10,7 @@ import { resolve } from 'node:path';
  */
 export function isValidUid(uid: string): boolean
 {
-    return /^\d+$/.test(uid);
+  return /^\d+$/.test(uid);
 }
 
 /**
@@ -20,7 +20,7 @@ export function isValidUid(uid: string): boolean
  */
 export function hasWildcardUid(blockedUids: Array<{ name: string; uid: string; }>): boolean
 {
-    return blockedUids.some(item => item.uid.includes('*'));
+  return blockedUids.some(item => item.uid.includes('*'));
 }
 
 /**
@@ -30,7 +30,7 @@ export function hasWildcardUid(blockedUids: Array<{ name: string; uid: string; }
  */
 export function shouldIgnoreAllPrivateMessages(blockedUids: Array<{ name: string; uid: string; }>): boolean
 {
-    return hasWildcardUid(blockedUids);
+  return hasWildcardUid(blockedUids);
 }
 
 /**
@@ -41,31 +41,31 @@ export function shouldIgnoreAllPrivateMessages(blockedUids: Array<{ name: string
  */
 export function shouldBlockMessage(senderUid: string, blockedUids: Array<{ name: string; uid: string; }>): boolean
 {
-    // 如果包含通配符，忽略所有私信
-    if (shouldIgnoreAllPrivateMessages(blockedUids))
+  // 如果包含通配符，忽略所有私信
+  if (shouldIgnoreAllPrivateMessages(blockedUids))
+  {
+    logInfo(`检测到通配符配置，忽略所有私信消息`);
+    return true;
+  }
+
+  // 检查是否在屏蔽列表中
+  const shouldBlock = blockedUids.some(blocked =>
+  {
+    // 只验证有效的数字UID
+    if (!isValidUid(blocked.uid))
     {
-        logInfo(`检测到通配符配置，忽略所有私信消息`);
-        return true;
+      logInfo(`忽略无效的屏蔽UID配置: ${blocked.uid} (名称: ${blocked.name})`);
+      return false;
     }
+    return blocked.uid === senderUid;
+  });
 
-    // 检查是否在屏蔽列表中
-    const shouldBlock = blockedUids.some(blocked =>
-    {
-        // 只验证有效的数字UID
-        if (!isValidUid(blocked.uid))
-        {
-            logInfo(`忽略无效的屏蔽UID配置: ${blocked.uid} (名称: ${blocked.name})`);
-            return false;
-        }
-        return blocked.uid === senderUid;
-    });
+  if (shouldBlock)
+  {
+    logInfo(`屏蔽来自UID ${senderUid} 的消息`);
+  }
 
-    if (shouldBlock)
-    {
-        logInfo(`屏蔽来自UID ${senderUid} 的消息`);
-    }
-
-    return shouldBlock;
+  return shouldBlock;
 }
 
 /**
@@ -75,15 +75,15 @@ export function shouldBlockMessage(senderUid: string, blockedUids: Array<{ name:
  */
 export function filterValidBlockedUids(blockedUids: Array<{ name: string; uid: string; }>): Array<{ name: string; uid: string; }>
 {
-    return blockedUids.filter(item =>
+  return blockedUids.filter(item =>
+  {
+    const isValid = isValidUid(item.uid) || item.uid.includes('*');
+    if (!isValid)
     {
-        const isValid = isValidUid(item.uid) || item.uid.includes('*');
-        if (!isValid)
-        {
-            logInfo(`过滤无效的屏蔽配置: UID=${item.uid}, 名称=${item.name}`);
-        }
-        return isValid;
-    });
+      logInfo(`过滤无效的屏蔽配置: UID=${item.uid}, 名称=${item.name}`);
+    }
+    return isValid;
+  });
 }
 
 /**
@@ -95,11 +95,11 @@ export function filterValidBlockedUids(blockedUids: Array<{ name: string; uid: s
  */
 export function getDataFilePath(ctx: Context, selfId: string, ...subpaths: string[]): string
 {
-    if (!selfId)
-    {
-        // 在没有 selfId 的情况下，直接返回基础数据目录
-        return resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm');
-    }
-    // 为每个 selfId 创建独立的子目录
-    return resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm', selfId, ...subpaths);
+  if (!selfId)
+  {
+    // 在没有 selfId 的情况下，直接返回基础数据目录
+    return resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm');
+  }
+  // 为每个 selfId 创建独立的子目录
+  return resolve(ctx.baseDir, 'data', 'adapter-bilibili-dm', selfId, ...subpaths);
 }

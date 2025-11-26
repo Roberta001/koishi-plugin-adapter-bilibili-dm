@@ -158,43 +158,6 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>>
     // 立即刷新前端
     this.refresh();
 
-    // 监听特定于selfId的状态更新事件
-    const statusEventName = `bilibili-dm-${config.selfId}/status-update`;
-    ctx.on(statusEventName as keyof import('koishi').Events, (status: BotStatus) =>
-    {
-      logInfo(`收到特定实例状态更新通知: ${status.selfId} -> ${status.status}`);
-
-      if (status.selfId === config.selfId)
-      {
-        this.consoleMessages[status.selfId] = {
-          ...status,
-          selfId: config.selfId
-        };
-        // 刷新前端
-        this.refresh();
-      } else
-      {
-        logInfo(`忽略非本实例的状态更新: ${status.selfId}`);
-      }
-    });
-
-    ctx.on('bilibili-dm/status-update', (status: BotStatus) =>
-    {
-      if (status.selfId === config.selfId)
-      {
-        logInfo(`收到通用状态更新通知: ${status.selfId} -> ${status.status}`);
-
-        // 更新控制台消息
-        this.consoleMessages[status.selfId] = {
-          ...status,
-          selfId: config.selfId
-        };
-
-        // 刷新前端
-        this.refresh();
-      }
-    });
-
     // 前端发来的登录请求
     const loginEventName = `bilibili-dm-${config.selfId}/start-login` as const;
 
@@ -207,12 +170,11 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>>
       logInfo(`当前机器人列表: ${ctx.bots.map(bot => `${bot.platform}:${bot.selfId}`).join(', ')}`);
 
       // 更新状态
-      this.consoleMessages[selfId] = {
+      this.updateStatus({
         status: 'init',
         selfId: selfId,
         message: '正在初始化...'
-      };
-      this.refresh();
+      });
 
       // 创建新机器人实例
       logInfo(`创建新机器人实例，使用selfId: ${selfId}`);
@@ -238,6 +200,26 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>>
 
       return { selfId };
     });
+  }
+
+  // 更新状态并刷新前端
+  updateStatus(status: BotStatus): void
+  {
+    if (!status.selfId)
+    {
+      logInfo('updateStatus: selfId为空，无法更新状态');
+      return;
+    }
+
+    logInfo(`BilibiliLauncher更新状态: ${status.selfId} -> ${status.status}`);
+
+    this.consoleMessages[status.selfId] = {
+      ...status,
+      selfId: status.selfId
+    };
+
+    // 刷新前端
+    this.refresh();
   }
 
   // 获取控制台消息
@@ -340,12 +322,17 @@ export function apply(ctx: Context, config: PluginConfig)
       });
     }
 
+    // 创建 launcher 实例并保存引用
+    let launcher: BilibiliLauncher;
     ctx.plugin({
       name: `bilibili-launcher-${config.selfId}`,
       apply: (ctx) =>
       {
         logInfo(`创建BilibiliLauncher实例，selfId: ${config.selfId}`);
-        return new BilibiliLauncher(ctx, service, config);
+        launcher = new BilibiliLauncher(ctx, service, config);
+        // 将 launcher 引用传递给 service
+        service.setLauncher(launcher);
+        return launcher;
       }
     });
 
