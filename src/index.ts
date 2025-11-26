@@ -96,7 +96,6 @@ declare module 'koishi' {
     'bilibili/live-start': (data: import('./bilibiliAPI/apis/types').LiveEventData) => void;
     'bilibili/live-end': (data: import('./bilibiliAPI/apis/types').LiveEventData) => void;
     'bilibili/live-info-update': (data: import('./bilibiliAPI/apis/types').LiveEventData) => void;
-    [key: `bilibili-dm-${string}/start-login`]: (data: { selfId: string; }) => void;
   }
 }
 
@@ -107,6 +106,11 @@ declare module '@koishijs/plugin-console' {
     {
       [key: `bilibili-dm-${string}`]: BilibiliLauncher;
     }
+  }
+
+  interface Events
+  {
+    [key: `bilibili-dm-${string}/start-login`]: (data: { selfId: string; }) => Promise<{ selfId: string; }>;
   }
 }
 
@@ -194,11 +198,12 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>>
     // 前端发来的登录请求
     const loginEventName = `bilibili-dm-${config.selfId}/start-login` as const;
 
-    ctx.on(loginEventName, async (data: { selfId: string; }) =>
+    ctx.console.addListener(loginEventName, async (data: { selfId: string; }) =>
     {
       const selfId = data.selfId || config.selfId;
       this.currentBot = selfId;
 
+      logInfo(`收到前端登录请求，selfId: ${selfId}`);
       logInfo(`当前机器人列表: ${ctx.bots.map(bot => `${bot.platform}:${bot.selfId}`).join(', ')}`);
 
       // 更新状态
@@ -230,6 +235,8 @@ export class BilibiliLauncher extends DataService<Record<string, BotStatus>>
       // 启动登录流程
       logInfo(`开始启动登录流程...`);
       await this.service.startLogin(bot, sessionFile);
+
+      return { selfId };
     });
   }
 
